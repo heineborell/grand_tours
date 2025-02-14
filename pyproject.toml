@@ -1,0 +1,14 @@
+[build-system]
+requires=["setuptools","setuptools-scm"]
+build-backend="setuptools.build_meta"
+
+[project]
+name='grand_tours'
+version="0.1"
+dependencies = [
+    "numpy",
+]
+
+[project.optional-dependencies]
+dev = ["pre-commit","ruff"]
+

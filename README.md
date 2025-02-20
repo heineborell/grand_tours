@@ -5,36 +5,9 @@
 Here we discuss the structure of the database, starting with the relational
 table outlined below.
 
-<pre class='mermaid'>
-erDiagram
-    tdf_results {str name FK
-  int year
-  int time}
+<!-- ![table structure](assets/readme_images/ss_2_12.png) -->
 
-    strava_names {int athlete_id PK
-  str name}
-
-    segments_data {int activity_id PK
-  int athlete_id FK
-
-  }
-    stats_data {int activity_id PK
-  int athlete_id FK
-
-  }
-
-  strava_table {int activity_id PK
-  int athlete_id FK
-
-
-  }
-     strava_names||--|{  tdf_results: ""
-     strava_names||--|{  segments_data: ""
-     strava_names||--|{  stats_data: ""
-     strava_table||--||  stats_data: ""
-     strava_table||--||  segments_data: ""
-
-  </pre>
+<img src="assets/readme_images/ss_2_12.png" width="650">
 
 The primary tables in our database are `tdf_results`, `giro_results` and
 `vuelta_results`, which were scraped from
@@ -65,7 +38,7 @@ years, as shown below:
 
 The table `strava_names` is simply scraped by first taking the names of the riders from `results` table starting from 2010. Then each name is searched through Strava search athlete tab. Once we have the result we simply choose the `athlete_id` number with the pro tag on in (see the image below).
 
-![image](assets/readme_images/ss_2_10.png)
+<img src="assets/readme_images/ss_2_10.png" width="450">
 
 After we forming the `strava_names` table we are now in a position to extract the data from riders profile. For that we first
 visit the riders main page which looks like the following.
@@ -130,7 +103,3 @@ WHERE (t1.distance-t1.distance * 0.2 ) < t3.strava_distance
 AND t3.strava_distance < (t1.distance * 0.2 + t1.distance);
 
 ```
-
-<script type="module"> import mermaid from
-'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-mermaid.initialize({ startOnLoad: true, theme: 'dark' }); </script>

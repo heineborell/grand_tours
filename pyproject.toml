@@ -7,6 +7,7 @@ name='grand_tours'
 version="0.1"
 dependencies = [
     "numpy",
+    "pandas",
 ]
 
 [project.optional-dependencies]

@@ -31,9 +31,9 @@ years, as shown below:
     straightforward to extract insights using SQL queries, provided the
     questions are well-defined. </p> </div>
 
-<div style="display: flex; align-items: center;">  
-  <img src="assets/readme_images/ss_2_7.png" alt="Description" style="width: 250px; margin-right: 20px;">  
-  <p>Working with Strava datasets requires a more intricate approach for both scraping and structuring. We start with the <code>strava_names</code> table, which contains riders' <code>names</code> and their unique <code>athlete_id</code>. While constructing this table, we assumed that the names in the <code>results</code> table are unique. This assumption is reasonable, as the dataset only includes results from 2010 onward, aligning with Strava's historical data coverage. </p>  
+<div style="display: flex; align-items: center;">
+  <img src="assets/readme_images/ss_2_7.png" alt="Description" style="width: 250px; margin-right: 20px;">
+  <p>Working with Strava datasets requires a more intricate approach for both scraping and structuring. We start with the <code>strava_names</code> table, which contains riders' <code>names</code> and their unique <code>athlete_id</code>. While constructing this table, we assumed that the names in the <code>results</code> table are unique. This assumption is reasonable, as the dataset only includes results from 2010 onward, aligning with Strava's historical data coverage. </p>
 </div>
 
 The table `strava_names` is simply scraped by first taking the names of the riders from `results` table starting from 2010. Then each name is searched through Strava search athlete tab. Once we have the result we simply choose the `athlete_id` number with the pro tag on in (see the image below).
@@ -92,14 +92,14 @@ FROM
 LEFT JOIN stats_data AS l
 	ON l.activity_id = t2.activity_id) as t3
 INNER JOIN (SELECT
-	DISTINCT(substr("--JanFebMarAprMayJunJulAugSepOctNovDec", 
+	DISTINCT(substr("--JanFebMarAprMayJunJulAugSepOctNovDec",
     strftime("%m", DATE) * 3, 3)||' '||CAST(strftime('%d', DATE) AS INTEGER)||' '||strftime('%Y', DATE)) AS tdf_date,
-	stage, distance 
+	stage, distance
 FROM
 	tdf_results
 ) AS t1
 ON t1.tdf_date  = t3.DATE
-WHERE (t1.distance-t1.distance * 0.2 ) < t3.strava_distance 
+WHERE (t1.distance-t1.distance * 0.2 ) < t3.strava_distance
 AND t3.strava_distance < (t1.distance * 0.2 + t1.distance);
 
 ```

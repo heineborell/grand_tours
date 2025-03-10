@@ -1,3 +1,6 @@
+import ast
+
+
 def check_overlap(segment1: list[int], segment2: list[int]) -> bool:
     """
     Check if two segments overlap
@@ -110,7 +113,7 @@ def optimize_segments(segments: list[list[int]], prefer_longest_segments: bool =
     return sorted(selected, key=lambda x: x[0])
 
 
-def analyze_solution(segments: list[list[int]], result: list[list[int]]):
+def analyze_solution(result: list[list[int]]):
     """
     Analyze and print statistics about the solution
     """
@@ -132,14 +135,43 @@ def analyze_solution(segments: list[list[int]], result: list[list[int]]):
         print(f"  {start}-{end} ({end - start}m)")
 
 
-# Example usage
-def segment_picker(segments):
-    print("\nOptimizing for longest segments:")
+def greedy_picker(segments):
+    ordered_list = sorted(segments, key=lambda x: x[1])
+
+    selected = []
+    for i, elmt in enumerate(ordered_list):
+        if i == 0:
+            selected.append(elmt)
+        elif i > 0:
+            if float(selected[-1][-1]) < float(elmt[0]):
+                selected.append(elmt)
+            else:
+                pass
+
+    # Sort final result by start position
+    return sorted(selected, key=lambda x: x[0])
+
+
+def segment_picker(segments, report=True):
     longest_segments = optimize_segments(segments, prefer_longest_segments=True)
-    analyze_solution(segments, longest_segments)
 
-    print("\nOptimizing for maximum coverage:")
     max_coverage = optimize_segments(segments, prefer_longest_segments=False)
-    analyze_solution(segments, max_coverage)
 
-    return longest_segments, max_coverage
+    greedy = greedy_picker(segments)
+    if report:
+        print("\nOptimizing for longest segments:")
+        analyze_solution(longest_segments)
+        print("\nOptimizing for maximum coverage:")
+        analyze_solution(max_coverage)
+        print("\nOptimizing using the simple greedy algorithm:")
+        analyze_solution(greedy)
+
+    return longest_segments, max_coverage, greedy
+
+
+def name_getter(stage_df, reduced_segments):
+    index_list = []
+    for seg in reduced_segments:
+        index_list.append([ast.literal_eval(k) for k in stage_df["end_points"]].index(seg))
+
+    return stage_df.iloc[index_list]

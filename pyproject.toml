@@ -9,6 +9,7 @@ dependencies = [
     "numpy",
     "pandas",
     "ipykernel",
+    "pydantic",
 ]
 
 [project.optional-dependencies]

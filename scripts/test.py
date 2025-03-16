@@ -4,7 +4,7 @@ import sqlite3
 
 import pandas as pd
 
-import segment_analyse
+from data.segment_analyse import name_getter, segment_picker
 
 if __name__ == "__main__":
     username = getpass.getuser()
@@ -24,10 +24,8 @@ if __name__ == "__main__":
         print(id)
         stage_df = df.loc[df["stage"] == id].reset_index(drop=True)
         segment_list = [ast.literal_eval(k) for k in stage_df["end_points"]]
-        longest_seg, max_coverage, greedy = segment_analyse.segment_picker(segment_list, report=False)
-        nonoverlapping_segments = pd.concat(
-            [nonoverlapping_segments, segment_analyse.name_getter(stage_df, max_coverage)]
-        )
+        longest_seg, max_coverage, greedy = segment_picker(segment_list, report=False)
+        nonoverlapping_segments = pd.concat([nonoverlapping_segments, name_getter(stage_df, max_coverage)])
 
     conn = sqlite3.connect(f"/Users/{username}/iCloud/Research/Data_Science/Projects/data/grand_tours.db")
 

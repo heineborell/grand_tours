@@ -2,6 +2,7 @@ import json
 import os
 import sqlite3
 from datetime import datetime
+from typing import Optional
 
 from data.schema import Ride, Rider
 
@@ -35,17 +36,33 @@ def fetch_rides(db_path_activity, db_path_name):
     return riders_data
 
 
-def hms_to_seconds(hms: str) -> int:
-    parts = list(map(int, hms.split(":")))
+def hms_to_seconds(hms: dict[int, str]) -> Optional[int]:
+    try:
+        hms_value = hms["move_time"]  # Ensure this is a valid key
+        if isinstance(hms_value, str):  # Check if it's a string
+            if hms_value.endswith("s"):  # Only seconds format (e.g., "2s")
+                return int(hms_value[:-1])  # Convert "2s" -> 2
 
-    if len(parts) == 3:  # H:M:S format
-        h, m, s = parts
-    elif len(parts) == 2:  # M:S format (assume 0 hours)
-        h, m, s = 0, *parts
-    else:
-        raise ValueError("Invalid time format. Expected H:M:S or M:S")
+            parts = list(map(int, hms_value.split(":")))
 
-    return h * 3600 + m * 60 + s
+            if len(parts) == 3:  # H:M:S format
+                h, m, s = parts
+            elif len(parts) == 2:  # M:S format (assume 0 hours)
+                h, m, s = 0, *parts
+            else:
+                raise ValueError("Invalid time format. Expected H:M:S, M:S, or Ns")
+
+            return h * 3600 + m * 60 + s  # Corrected return statement
+
+    except (KeyError, ValueError, TypeError):  # Handle possible exceptions
+        return None
+
+
+def get_elevation(row_json):
+    try:
+        return row_json["elevation"].replace(",", "").split(" ")[0]
+    except (KeyError, AttributeError):
+        return None  # Return None if key is missing
 
 
 def safe_get_wap(row_json):
@@ -87,8 +104,8 @@ def get_rider(athlete_id, table_name, NAME_DB_PATH, ACTIVITY_DB_PATH):
         Ride(
             activity_id=row[0],
             distance=json.loads(row[4])["dist"].split(" ")[0],
-            time=hms_to_seconds(json.loads(row[4])["move_time"]),
-            elevation=json.loads(row[4])["elevation"].replace(",", "").split(" ")[0],
+            time=hms_to_seconds(json.loads(row[4])),
+            elevation=get_elevation(json.loads(row[4])),
             avg_power=safe_get_wap(json.loads(row[4])),
             tour_year=row[2],
             ride_date=mdy_to_ymd(row[3]),

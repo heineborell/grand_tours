@@ -1,3 +1,4 @@
+from datetime import date
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
@@ -10,6 +11,7 @@ class Ride(BaseModel):
     elevation: int = Field(..., gt=0, description="Total ascension in meters.")
     avg_power: Optional[int] = None
     tour_year: str = Field(..., description="Tour year and shows training or not")
+    ride_date: date = Field(..., description="Date of the activity.")
 
 
 class Rider(BaseModel):

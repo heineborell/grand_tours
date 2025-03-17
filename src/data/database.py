@@ -1,6 +1,7 @@
 import json
 import os
 import sqlite3
+from datetime import datetime
 
 from data.schema import Ride, Rider
 
@@ -54,6 +55,14 @@ def safe_get_wap(row_json):
         return None  # Return None if key is missing
 
 
+def mdy_to_ymd(d):
+    try:
+        date = datetime.strptime(d, "%b %d %Y").strftime("%Y-%m-%d")
+    except ValueError:
+        date = datetime.strptime(d, "%B %d %Y").strftime("%Y-%m-%d")
+    return date
+
+
 def get_rider(athlete_id, table_name, NAME_DB_PATH, ACTIVITY_DB_PATH):
     # Fetch rider name
     with sqlite3.connect(NAME_DB_PATH) as conn:
@@ -82,6 +91,7 @@ def get_rider(athlete_id, table_name, NAME_DB_PATH, ACTIVITY_DB_PATH):
             elevation=json.loads(row[4])["elevation"].replace(",", "").split(" ")[0],
             avg_power=safe_get_wap(json.loads(row[4])),
             tour_year=row[2],
+            ride_date=mdy_to_ymd(row[3]),
         )
         for row in ride_rows
     ]

@@ -18,3 +18,21 @@ class Rider(BaseModel):
     strava_id: int = Field(..., gt=0, description="Rider strava unique id.")
     name: str = Field(..., description="Rider's name")
     rides: List[Ride]
+
+    def to_dataframe(self):
+        import pandas as pd
+
+        return pd.DataFrame(
+            [
+                {
+                    "strava_id": self.strava_id,
+                    "activity_id": ride.activity_id,
+                    "distance": ride.distance,
+                    "avg_power": ride.avg_power,
+                    "time": ride.time,
+                    "tour_year": ride.tour_year,
+                    "ride_date": ride.ride_date,
+                }
+                for ride in self.rides
+            ]
+        )

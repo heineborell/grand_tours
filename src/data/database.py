@@ -77,10 +77,10 @@ def get_rider(athlete_id, table_name, NAME_DB_PATH, ACTIVITY_DB_PATH):
     rides = [
         Ride(
             activity_id=row[0],
-            distance=json.loads(row[3])["dist"].split(" ")[0],
-            time=hms_to_seconds(json.loads(row[3])["move_time"]),
-            elevation=json.loads(row[3])["elevation"].replace(",", "").split(" ")[0],
-            avg_power=safe_get_wap(json.loads(row[3])),
+            distance=json.loads(row[4])["dist"].split(" ")[0],
+            time=hms_to_seconds(json.loads(row[4])["move_time"]),
+            elevation=json.loads(row[4])["elevation"].replace(",", "").split(" ")[0],
+            avg_power=safe_get_wap(json.loads(row[4])),
             tour_year=row[2],
         )
         for row in ride_rows

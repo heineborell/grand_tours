@@ -47,6 +47,13 @@ def hms_to_seconds(hms: str) -> int:
     return h * 3600 + m * 60 + s
 
 
+def safe_get_wap(row_json):
+    try:
+        return row_json["wap"].split(" ")[0]  # Extract value safely
+    except (KeyError, AttributeError):
+        return None  # Return None if key is missing
+
+
 def get_rider(athlete_id, table_name, NAME_DB_PATH, ACTIVITY_DB_PATH):
     # Fetch rider name
     with sqlite3.connect(NAME_DB_PATH) as conn:
@@ -73,6 +80,8 @@ def get_rider(athlete_id, table_name, NAME_DB_PATH, ACTIVITY_DB_PATH):
             distance=json.loads(row[3])["dist"].split(" ")[0],
             time=hms_to_seconds(json.loads(row[3])["move_time"]),
             elevation=json.loads(row[3])["elevation"].replace(",", "").split(" ")[0],
+            avg_power=safe_get_wap(json.loads(row[3])),
+            tour_year=row[2],
         )
         for row in ride_rows
     ]

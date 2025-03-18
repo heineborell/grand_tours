@@ -50,6 +50,45 @@ def mdy_to_ymd(d):
     return date
 
 
+def get_first_day_race(database_path):
+    # Fetch the race dates
+    with sqlite3.connect(database_path) as conn:
+        cursor = conn.cursor()
+        query = """
+SELECT MIN(formatted_date) AS first_day_race, tour_year
+FROM (
+    SELECT substr(datetime(
+        substr(DATE, -4) || '-' ||
+        CASE substr(DATE, 1, 3)
+            WHEN 'Jan' THEN '01'
+            WHEN 'Feb' THEN '02'
+            WHEN 'Mar' THEN '03'
+            WHEN 'Apr' THEN '04'
+            WHEN 'May' THEN '05'
+            WHEN 'Jun' THEN '06'
+            WHEN 'Jul' THEN '07'
+            WHEN 'Aug' THEN '08'
+            WHEN 'Sep' THEN '09'
+            WHEN 'Oct' THEN '10'
+            WHEN 'Nov' THEN '11'
+            WHEN 'Dec' THEN '12'
+        END || '-' ||
+        CASE
+            WHEN CAST(TRIM(substr(DATE, 5, INSTR(substr(DATE, 5), ' ')-1)) AS INTEGER) < 10
+                THEN '0' || TRIM(substr(DATE, 5, INSTR(substr(DATE, 5), ' ')-1))
+            ELSE TRIM(substr(DATE, 5, INSTR(substr(DATE, 5), ' ')-1))
+        END
+    ), 1, 10) AS formatted_date, tour_year
+    FROM strava_table AS t1
+)
+GROUP BY tour_year;
+        """
+        cursor = conn.cursor()
+        # Fetch rider name
+        date_list = cursor.execute(query).fetchall()
+    return date_list
+
+
 def get_rider(athlete_id, table_name, NAME_DB_PATH, ACTIVITY_DB_PATH):
     # Fetch rider name
     with sqlite3.connect(NAME_DB_PATH) as conn:
@@ -61,6 +100,8 @@ def get_rider(athlete_id, table_name, NAME_DB_PATH, ACTIVITY_DB_PATH):
             return None  # Rider not found
 
         rider_name = rider_row[0]
+
+    get_first_day_race(NAME_DB_PATH)
 
     # Fetch rides
     with sqlite3.connect(ACTIVITY_DB_PATH) as conn:

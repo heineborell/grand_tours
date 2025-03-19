@@ -7,6 +7,7 @@ from data.schemas import Ride, Rider
 
 
 def hms_to_seconds(hms: dict[int, str]) -> Optional[int]:
+    """Takes the time in formats H:M:S, M:S, S to seconds"""
     try:
         hms_value = hms["move_time"]  # Ensure this is a valid key
         if isinstance(hms_value, str):  # Check if it's a string

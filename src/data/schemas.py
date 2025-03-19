@@ -12,6 +12,7 @@ class Ride(BaseModel):
     avg_power: Optional[int] = Field(..., description="Average Power in watts.")
     tour_year: str = Field(..., description="Tour year and shows if its training or not")
     ride_date: date = Field(..., description="Date of the activity.")
+    race_start_day: date = Field(..., description="First day of the race that is considered.")
 
 
 class Rider(BaseModel):
@@ -32,6 +33,7 @@ class Rider(BaseModel):
                     "time": ride.time,
                     "tour_year": ride.tour_year,
                     "ride_week": ride.ride_date.isocalendar().week,
+                    "race_week": ride.race_start_day,
                 }
                 for ride in self.rides
             ]

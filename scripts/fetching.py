@@ -1,3 +1,4 @@
+import subprocess
 from getpass import getuser
 
 from data.database import get_rider
@@ -12,6 +13,7 @@ rider = get_rider(athlete_id=189040, table_name="training_table", NAME_DB_PATH=D
 
 # print(rider.model_dump())
 print(rider.to_dataframe())
+subprocess.run(["vd", "-f", "csv", "-"], input=rider.to_dataframe().to_csv(index=False), text=True)
 # print(rider.to_dataframe())
 
 # print(fetch_riders(DB_PATH_2, "tdf", 2024))

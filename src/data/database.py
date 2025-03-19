@@ -101,7 +101,7 @@ def get_rider(athlete_id, table_name, NAME_DB_PATH, ACTIVITY_DB_PATH):
 
         rider_name = rider_row[0]
 
-    get_first_day_race(NAME_DB_PATH)
+    race_day_list = [i[1] for i in get_first_day_race(NAME_DB_PATH)]
 
     # Fetch rides
     with sqlite3.connect(ACTIVITY_DB_PATH) as conn:
@@ -120,6 +120,7 @@ def get_rider(athlete_id, table_name, NAME_DB_PATH, ACTIVITY_DB_PATH):
             avg_power=safe_get_wap(json.loads(row[4])),
             tour_year=row[2],
             ride_date=mdy_to_ymd(row[3]),
+            race_start_day=get_first_day_race(NAME_DB_PATH)[race_day_list.index(row[2].split("_")[0] + row[2][12:])][0],
         )
         for row in ride_rows
     ]

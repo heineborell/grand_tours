@@ -89,7 +89,7 @@ GROUP BY tour_year;
     return date_list
 
 
-def get_rider(athlete_id, table_name, NAME_DB_PATH, ACTIVITY_DB_PATH):
+def get_rider(athlete_id, NAME_DB_PATH, ACTIVITY_DB_PATH, training=True):
     # Fetch rider name
     with sqlite3.connect(NAME_DB_PATH) as conn:
         cursor = conn.cursor()
@@ -105,11 +105,18 @@ def get_rider(athlete_id, table_name, NAME_DB_PATH, ACTIVITY_DB_PATH):
     race_day_list = [i[1] for i in race_day_list_full]
 
     # Fetch rides
-    with sqlite3.connect(ACTIVITY_DB_PATH) as conn:
-        cursor = conn.cursor()
-        rides_query = f"SELECT * FROM {table_name} WHERE athlete_id=?"
-        # Execute with a tuple for values
-        ride_rows = cursor.execute(rides_query, (athlete_id,)).fetchall()
+    if training:
+        with sqlite3.connect(ACTIVITY_DB_PATH) as conn:
+            cursor = conn.cursor()
+            rides_query = "SELECT * FROM training_table WHERE athlete_id=?"
+            # Execute with a tuple for values
+            ride_rows = cursor.execute(rides_query, (athlete_id,)).fetchall()
+    else:
+        with sqlite3.connect(NAME_DB_PATH) as conn:
+            cursor = conn.cursor()
+            rides_query = "SELECT * FROM strava_table WHERE athlete_id=?"
+            # Execute with a tuple for values
+            ride_rows = cursor.execute(rides_query, (athlete_id,)).fetchall()
 
     # # Convert SQL rows to Pydantic models
     rides = [

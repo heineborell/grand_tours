@@ -29,6 +29,7 @@ class Rider(BaseModel):
                     "strava_id": self.strava_id,
                     "activity_id": ride.activity_id,
                     "distance": ride.distance,
+                    "elevation": ride.elevation,
                     "avg_power": ride.avg_power,
                     "time": ride.time,
                     "tour_year": ride.tour_year,

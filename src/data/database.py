@@ -114,24 +114,41 @@ def get_rider(athlete_id, tour, year, grand_tours_db_path, training_db_path, tra
     else:
         with sqlite3.connect(grand_tours_db_path) as conn:
             cursor = conn.cursor()
-            rides_query = "SELECT * FROM strava_table WHERE athlete_id=?"
+            rides_query = "SELECT * FROM strava_table WHERE athlete_id=? AND tour_year=?"
             # Execute with a tuple for values
-            ride_rows = cursor.execute(rides_query, (athlete_id,)).fetchall()
+            ride_rows = cursor.execute(rides_query, (athlete_id, tour + str(-year))).fetchall()
 
     # # Convert SQL rows to Pydantic models
-    rides = [
-        Ride(
-            activity_id=row[0],
-            distance=json.loads(row[4])["dist"].split(" ")[0],
-            time=hms_to_seconds(json.loads(row[4])),
-            elevation=get_elevation(json.loads(row[4])),
-            avg_power=safe_get_wap(json.loads(row[4])),
-            tour_year=row[2],
-            ride_date=mdy_to_ymd(row[3]),
-            race_start_day=race_day_list_full[race_day_list.index(row[2].split("_")[0] + row[2][12:])][0],
-        )
-        for row in ride_rows
-    ]
-    rider = Rider(strava_id=athlete_id, name=rider_name, rides=rides)
+    if training:
+        rides = [
+            Ride(
+                activity_id=row[0],
+                distance=json.loads(row[4])["dist"].split(" ")[0],
+                time=hms_to_seconds(json.loads(row[4])),
+                elevation=get_elevation(json.loads(row[4])),
+                avg_power=safe_get_wap(json.loads(row[4])),
+                tour_year=row[2],
+                ride_date=mdy_to_ymd(row[3]),
+                race_start_day=race_day_list_full[race_day_list.index(row[2].split("_")[0] + row[2][12:])][0],
+            )
+            for row in ride_rows
+        ]
+        rider = Rider(strava_id=athlete_id, name=rider_name, rides=rides)
+    else:
+        rides = [
+            Ride(
+                activity_id=row[0],
+                distance=json.loads(row[-1])["dist"].split(" ")[0],
+                time=hms_to_seconds(json.loads(row[-1])),
+                elevation=get_elevation(json.loads(row[-1])),
+                avg_power=safe_get_wap(json.loads(row[-1])),
+                stage=row[6].strip(" "),
+                tour_year=row[2],
+                ride_date=mdy_to_ymd(row[5]),
+                race_start_day=race_day_list_full[race_day_list.index(row[2].split("_")[0] + row[2][12:])][0],
+            )
+            for row in ride_rows
+        ]
+        rider = Rider(strava_id=athlete_id, name=rider_name, rides=rides)
 
     return rider

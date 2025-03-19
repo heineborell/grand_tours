@@ -32,8 +32,8 @@ class Rider(BaseModel):
                     "avg_power": ride.avg_power,
                     "time": ride.time,
                     "tour_year": ride.tour_year,
-                    "ride_week": ride.ride_date.isocalendar().week,
-                    "race_week": ride.race_start_day,
+                    "ride_day": ride.ride_date,
+                    "race_day": ride.race_start_day,
                 }
                 for ride in self.rides
             ]

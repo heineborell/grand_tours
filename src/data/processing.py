@@ -27,3 +27,9 @@ def create_training_dataframe(rider_ids, tour, year, grand_tours_db, training_db
         final_df = pd.concat(dfs, ignore_index=True)
 
     return final_df
+
+
+def create_features(data):
+    # Feature Engineering
+    data["time_delta"] = (data["race_start_day"] - data["ride_day"]).apply(lambda x: x.days)
+    return data

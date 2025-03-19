@@ -16,6 +16,7 @@ DB_PATH_2 = f"/Users/{username}/iCloud/Research/Data_Science/Projects/data/grand
 # print(rider.to_dataframe())
 
 full_df = create_training_dataframe(
-    fetch_riders(DB_PATH_2, "tdf", 2024), "tdf", 2024, DB_PATH_2, DB_PATH_1, training=False
+    fetch_riders(DB_PATH_2, "tdf", 2024), "tdf", 2024, DB_PATH_2, DB_PATH_1, training=True
 )
+# train_model(189040, full_df)
 subprocess.run(["vd", "-f", "csv", "-"], input=full_df.to_csv(index=False), text=True)

@@ -10,6 +10,7 @@ dependencies = [
     "pandas",
     "ipykernel",
     "pydantic",
+    "scikit-learn"
 ]
 
 [project.optional-dependencies]

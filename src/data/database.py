@@ -89,9 +89,9 @@ GROUP BY tour_year;
     return date_list
 
 
-def get_rider(athlete_id, NAME_DB_PATH, ACTIVITY_DB_PATH, training=True):
+def get_rider(athlete_id, tour, year, grand_tours_db_path, training_db_path, training=True):
     # Fetch rider name
-    with sqlite3.connect(NAME_DB_PATH) as conn:
+    with sqlite3.connect(grand_tours_db_path) as conn:
         cursor = conn.cursor()
         # Fetch rider name
         cursor.execute("SELECT name FROM strava_names WHERE athlete_id = ?", (athlete_id,))
@@ -101,18 +101,18 @@ def get_rider(athlete_id, NAME_DB_PATH, ACTIVITY_DB_PATH, training=True):
 
         rider_name = rider_row[0]
 
-    race_day_list_full = get_first_day_race(NAME_DB_PATH)
+    race_day_list_full = get_first_day_race(grand_tours_db_path)
     race_day_list = [i[1] for i in race_day_list_full]
 
     # Fetch rides
     if training:
-        with sqlite3.connect(ACTIVITY_DB_PATH) as conn:
+        with sqlite3.connect(training_db_path) as conn:
             cursor = conn.cursor()
-            rides_query = "SELECT * FROM training_table WHERE athlete_id=?"
+            rides_query = "SELECT * FROM training_table WHERE athlete_id=? AND tour_year=?"
             # Execute with a tuple for values
-            ride_rows = cursor.execute(rides_query, (athlete_id,)).fetchall()
+            ride_rows = cursor.execute(rides_query, (athlete_id, tour + "_training" + str(-year))).fetchall()
     else:
-        with sqlite3.connect(NAME_DB_PATH) as conn:
+        with sqlite3.connect(grand_tours_db_path) as conn:
             cursor = conn.cursor()
             rides_query = "SELECT * FROM strava_table WHERE athlete_id=?"
             # Execute with a tuple for values

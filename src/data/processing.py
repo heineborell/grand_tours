@@ -1,6 +1,7 @@
 import sqlite3
 
 import pandas as pd
+from rich import print as print
 
 from data.database import get_rider
 
@@ -15,6 +16,7 @@ def fetch_riders(DB_PATH, tour, year):
 
 def create_training_dataframe(rider_ids, tour, year, grand_tours_db, training_db_path, training=True):
     """Given a list of riders get the ride dataframe and concat all dfs."""
+    print("Creating dataframe")
     dfs = []
     for r in rider_ids:
         rider = get_rider(r, tour, year, grand_tours_db, training_db_path, training)

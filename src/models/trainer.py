@@ -1,13 +1,15 @@
+from rich import print as print
 from sklearn.model_selection import train_test_split
 
 from data.processing import create_features
 
 
 def train_model(athlete_id, dataframe):
+    print("started training")
     data = create_features(dataframe)
-    data = data.loc[data["athlete_id"] == athlete_id]
+    data = data.loc[data["strava_id"] == athlete_id]
 
-    X = data[["distance_km", "elevation", "time_delta"]]
+    X = data[["distance", "elevation", "time_delta"]]
     y = data["time"]  # Predicting power output
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)

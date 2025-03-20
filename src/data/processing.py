@@ -31,7 +31,13 @@ def create_training_dataframe(rider_ids, tour, year, grand_tours_db, training_db
     return final_df
 
 
-def create_features(data):
+def create_features(data, training):
     # Feature Engineering
     data["time_delta"] = (data["race_start_day"] - data["ride_day"]).apply(lambda x: x.days)
+    if training:
+        data = data.drop(index=data.loc[data["ride_day"] > data["race_start_day"]].index)
     return data
+
+
+def cleaning(data):
+    pass

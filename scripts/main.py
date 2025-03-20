@@ -1,5 +1,7 @@
 import yaml
 
+from data.data_loader import load_data
+
 # Load config
 with open("config/config.yaml", "r") as f:
     config = yaml.safe_load(f)
@@ -7,7 +9,8 @@ with open("config/config.yaml", "r") as f:
 
 print(config)
 # # Load data
-# data = load_data(config["data_path"])
+data = load_data("tdf", 2024, training=True)
+print(data)
 # X, y = data.drop("target", axis=1), data["target"]
 #
 # # Train model

@@ -7,16 +7,16 @@ from data.database import get_rider
 
 
 def fetch_riders(DB_PATH, tour, year):
-    """Enter tour-year e.g. 2024-tdf to get the list of rider_ids"""
+    """Enter tour and year e.g. 2024, tdf to get the list of rider_ids"""
     conn = sqlite3.connect(DB_PATH)
     query = f"SELECT DISTINCT(athlete_id) FROM strava_table WHERE tour_year='{tour}-{year}'"
     riders = conn.execute(query).fetchall()
     return [rider[0] for rider in riders]
 
 
-def create_training_dataframe(rider_ids, tour, year, grand_tours_db, training_db_path, training=True):
+def create_dataframe(rider_ids, tour, year, grand_tours_db, training_db_path, training=True):
     """Given a list of riders get the ride dataframe and concat all dfs."""
-    print("Creating dataframe")
+    print(f"Creating dataframe training:{training}")
     dfs = []
     for r in rider_ids:
         rider = get_rider(r, tour, year, grand_tours_db, training_db_path, training)
@@ -29,6 +29,11 @@ def create_training_dataframe(rider_ids, tour, year, grand_tours_db, training_db
         final_df = pd.concat(dfs, ignore_index=True)
 
     return final_df
+
+
+def clean_dataframe(data):
+    data = data[(data["distance"] > 0) & (data["elevation"] > 0)]
+    return data
 
 
 def create_features(data, training):

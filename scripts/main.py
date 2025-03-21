@@ -11,8 +11,13 @@ print(config)
 # # Load data
 data = load_data("tdf", 2024, training=True)
 print(data)
-# X, y = data.drop("target", axis=1), data["target"]
-#
+X, y = (
+    data.drop(["strava_id", "activity_id", "avg_power", "tour_year", "time", "ride_day", "race_start_day"], axis=1),
+    data["time"],
+)
+
+print(X, y)
+
 # # Train model
 # trainer = Trainer(config["model"])
 # trainer.train(X, y)

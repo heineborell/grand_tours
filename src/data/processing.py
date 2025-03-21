@@ -32,7 +32,7 @@ def create_dataframe(rider_ids, tour, year, grand_tours_db, training_db_path, tr
 
 
 def clean_dataframe(data):
-    data = data[(data["distance"] > 0) & (data["elevation"] > 0)]
+    data = data[(data["distance"] > 0) & (data["elevation"] > 0)].dropna(subset=["time"])
     return data
 
 

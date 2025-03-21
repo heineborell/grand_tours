@@ -11,17 +11,18 @@ with open("config/config.yaml", "r") as f:
 
 
 # # Load data
-data = load_data("tdf", 2024, training=True)
+data = load_data("tdf", 2022, training=True)
 X, y = (
     data.drop(["strava_id", "activity_id", "avg_power", "tour_year", "time", "ride_day", "race_start_day"], axis=1),
     data["time"],
 )
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-
-# # Train model
-trainer = Trainer("linear_regression")
+model = "random_forest_regressor"
+trainer = Trainer(model, config["models"][model]["hyperparameters"])
+# # # Train model
+# trainer = Trainer("linear_regression", hyperparams=None)
 trainer.train(X_train, y_train)
-# # Evaluate
+# # # Evaluate
 score = trainer.evaluate(X_test, y_test)
-print(f"{trainer.model.model} Performance: {score}")
+print(f"{trainer.model.model} RMSE: {score}")

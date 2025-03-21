@@ -7,10 +7,13 @@ from models.xgboost import XgBoostModel
 
 
 class Trainer:
-    def __init__(self, model_name, hyperparams):
+    def __init__(self, model_name, hyperparams=None):
         self.model = self._get_model(model_name, hyperparams)
 
     def _get_model(self, model_name, hyperparams):
+        if hyperparams is None:
+            hyperparams = {}  # Default to an empty dictionary
+
         if model_name == "linear_regression":
             return LinearRegressionModel()
         elif model_name == "random_forest_regressor":

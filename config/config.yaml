@@ -1,3 +1,3 @@
 model: "linear_regression"
-grand_tours_db_path: "/Users/deniz/iCloud/Research/Data_Science/Projects/data/grand_tours.db"
-training_db_path: "/Users/deniz/iCloud/Research/Data_Science/Projects/data/training_merged.db"
+grand_tours_db_path: "~/iCloud/Research/Data_Science/Projects/data/grand_tours.db"
+training_db_path: "~/iCloud/Research/Data_Science/Projects/data/training_merged.db"

@@ -1,3 +1,13 @@
-model: "linear_regression"
-grand_tours_db_path: "~/iCloud/Research/Data_Science/Projects/data/grand_tours.db"
-training_db_path: "~/iCloud/Research/Data_Science/Projects/data/training_merged.db"
+global:
+  grand_tours_db_path: "~/iCloud/Research/Data_Science/Projects/data/grand_tours.db"
+  training_db_path: "~/iCloud/Research/Data_Science/Projects/data/training_merged.db"
+
+models:
+  linear_regression:
+    hyperparameters:
+      fit_intercept: true
+  random_forest:
+    hyperparameters:
+      n_estimators: 100
+      max_depth: 10
+      min_samples_split: 2

@@ -42,7 +42,3 @@ def create_features(data, training):
     if training:
         data = data.drop(index=data.loc[data["ride_day"] > data["race_start_day"]].index)
     return data
-
-
-def cleaning(data):
-    pass

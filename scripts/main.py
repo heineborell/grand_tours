@@ -1,27 +1,27 @@
 import yaml
+from rich import print
+from sklearn.model_selection import train_test_split
 
 from data.data_loader import load_data
+from training.trainer import Trainer
 
 # Load config
 with open("config/config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 
-print(config)
 # # Load data
 data = load_data("tdf", 2024, training=True)
-print(data)
 X, y = (
     data.drop(["strava_id", "activity_id", "avg_power", "tour_year", "time", "ride_day", "race_start_day"], axis=1),
     data["time"],
 )
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-print(X, y)
 
 # # Train model
-# trainer = Trainer(config["model"])
-# trainer.train(X, y)
-#
+trainer = Trainer("linear_regression")
+trainer.train(X_train, y_train)
 # # Evaluate
-# score = trainer.evaluate(X, y)
-# print(f"Model Performance: {score}")
+score = trainer.evaluate(X_test, y_test)
+print(f"{trainer.model.model} Performance: {score}")

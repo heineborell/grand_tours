@@ -42,3 +42,32 @@ def create_features(data, training):
     if training:
         data = data.drop(index=data.loc[data["ride_day"] > data["race_start_day"]].index)
     return data
+
+
+# ## make empty rmse holder
+# cv_rmses = np.zeros((5, len(models)))
+#
+#
+# def kfold_split_train(X_train, models):
+#     kfold = KFold(n_splits=n_splits, shuffle=True, random_state=random_state)
+#     ## loop through all splits
+#     for train_index, test_index in kfold.split(X_train):
+#         ## get train and holdout sets
+#         X_train_train = X_train.iloc[train_index]
+#         X_holdout = X_train.iloc[test_index]
+
+
+#
+#         ## loop through all models
+#         j = 0
+#         for model in models:
+#                 ## make clone
+#                 reg = SVR(**best_params_SVR)
+#
+#                 ## fit clone
+#                 reg.fit(chl_train_train[model], chl_train_train.chl)
+#                 predict = reg.predict(chl_holdout[model])
+#
+#                 ## record mse
+#                 cv_rmses[i, j] = root_mean_squared_error(chl_holdout.chl, predict)
+#             j = j + 1

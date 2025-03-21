@@ -2,6 +2,7 @@ from rich import print
 
 from models.linear_regression import LinearRegressionModel
 from models.random_forest import RandomForestRegressorModel
+from models.xgboost import XgBoostModel
 
 
 class Trainer:
@@ -14,6 +15,8 @@ class Trainer:
             return LinearRegressionModel()
         elif model_name == "random_forest_regressor":
             return RandomForestRegressorModel(hyperparams)
+        elif model_name == "xgboost":
+            return XgBoostModel(hyperparams)
         else:
             raise ValueError(f"Unknown model: {model_name}")
 

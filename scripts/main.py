@@ -11,7 +11,7 @@ with open("config/config.yaml", "r") as f:
 
 
 # # Load data
-data = load_data("tdf", 2024, training=True)
+data = load_data("tdf", 2023, training=True)
 print(data.columns)
 
 # Splitting train and test

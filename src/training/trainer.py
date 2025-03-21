@@ -1,6 +1,7 @@
 from rich import print
 
 from models.linear_regression import LinearRegressionModel
+from models.linearsvr import LinearSVRModel
 from models.random_forest import RandomForestRegressorModel
 from models.xgboost import XgBoostModel
 
@@ -8,7 +9,6 @@ from models.xgboost import XgBoostModel
 class Trainer:
     def __init__(self, model_name, hyperparams):
         self.model = self._get_model(model_name, hyperparams)
-        print(f"Loaded {self.model.model}")
 
     def _get_model(self, model_name, hyperparams):
         if model_name == "linear_regression":
@@ -17,6 +17,8 @@ class Trainer:
             return RandomForestRegressorModel(hyperparams)
         elif model_name == "xgboost":
             return XgBoostModel(hyperparams)
+        elif model_name == "linearsvr":
+            return LinearSVRModel(hyperparams)
         else:
             raise ValueError(f"Unknown model: {model_name}")
 

@@ -1,13 +1,12 @@
-#
-#
 import numpy as np
 from rich import print
 
 from training.trainer import Trainer
 
 
-def kfold_split_train(X_train, models, config, features, target, kfold):
+def kfold_split_train(X_train, config, features, target, kfold):
     # make empty rmse holder
+    models = list(config["models"].keys())
     cv_rmses = np.zeros((5, len(models)))
     # loop through all splits
     for i, (train_index, test_index) in enumerate(kfold.split(X_train)):

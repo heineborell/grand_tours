@@ -1,4 +1,5 @@
 import concurrent.futures
+import json
 import time
 
 from rich import print
@@ -47,4 +48,16 @@ def gridder(model, X_train, config, features, target):
 
     # Get the best parameters
     best_params_SVR = grid_search.best_params_
+    json_writer(best_params_SVR, model, config)
     return f"Best Parameters: {best_params_SVR}"
+
+
+def json_writer(best_params, model, config):
+    config["models"][model]["hyperparameters"] = best_params
+
+    json_data = json.dumps(config, indent=4)
+    with open(
+        "config/config.json",
+        "w",
+    ) as f:
+        f.write(json_data)

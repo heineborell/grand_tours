@@ -3,8 +3,12 @@
         "grand_tours_db_path": "~/iCloud/Research/Data_Science/Projects/data/grand_tours.db",
         "training_db_path": "~/iCloud/Research/Data_Science/Projects/data/training_merged.db"
     },
-    "features":{["distance", "elevation", "time_delta"] },
-    "target":{["time"]},
+    "features": [
+        "distance",
+        "elevation",
+        "time_delta"
+    ],
+    "target": "time",
     "models": {
         "linear_regression": {
             "hyperparameters": null,
@@ -13,7 +17,7 @@
         "random_forest_regressor": {
             "hyperparameters": {
                 "min_samples_leaf": 2,
-                "n_estimators": 400
+                "n_estimators": 600
             },
             "param_grid": {
                 "min_samples_leaf": [

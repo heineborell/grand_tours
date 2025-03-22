@@ -1,14 +1,13 @@
+import json
 import os
-
-import yaml
 
 from data.processing import clean_dataframe, create_dataframe, create_features, fetch_riders
 
 
 def load_data(tour, year, training=True):
     # Load config
-    with open("config/config.yaml", "r") as f:
-        config = yaml.safe_load(f)
+    with open("config/config.json", "r") as f:
+        config = json.loads(f.read())
 
     grand_tours_db_path = os.path.expanduser(config["global"]["grand_tours_db_path"])
     training_db_path = os.path.expanduser(config["global"]["training_db_path"])

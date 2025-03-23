@@ -11,7 +11,7 @@ class Ride(BaseModel):
     elevation: Optional[int] = Field(..., description="Total ascension in meters.")
     avg_power: Optional[int] = Field(..., description="Average Power in watts.")
     tour_year: str = Field(..., description="Tour year and shows if its training or not")
-    stage: Optional[str] = Field(None)
+    stage: Optional[str] = Field(None, description="Race stage.")
     ride_date: date = Field(..., description="Date of the activity.")
     race_start_day: date = Field(..., description="First day of the race that is considered.")
 

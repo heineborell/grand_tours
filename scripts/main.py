@@ -7,9 +7,10 @@ from data.data_loader import load_data
 from training.gridsearch import param_search
 
 config_path = Path("config/config.json")
+db_path = Path("config/db_path.json")
 
 # # Load data
-data = load_data("tdf", 2024, training=True)
+data = load_data("tdf", 2024, db_path, training=True)
 print(data.columns)
 
 # Splitting train and test

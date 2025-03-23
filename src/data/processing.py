@@ -1,5 +1,6 @@
 import sqlite3
 
+import numpy as np
 import pandas as pd
 from rich import print as print
 
@@ -23,7 +24,17 @@ def create_dataframe(rider_ids, tour, year, grand_tours_db, training_db_path, tr
         if rider:  # Ensure rider is not None
             dfs.append(rider.to_dataframe())
 
-    dfs = [df for df in dfs if not df.empty]
+    dfs = [df for df in dfs if not df.empty if not df.empty and not df.isna().all().all()]
+    dfs = [df.map(lambda x: np.nan if (x is pd.NA or x is None) else x) for df in dfs]
+
+    for i, df in enumerate(dfs):
+        print(f"DataFrame {i}:")
+        print(df)
+        print("Shape:", df.shape)
+        print("Empty:", df.empty)
+        print("All-NA:", df.isna().all().all())
+        print("-" * 20)
+
     # Optionally, concatenate all DataFrames into one
     if dfs:
         final_df = pd.concat(dfs, ignore_index=True)

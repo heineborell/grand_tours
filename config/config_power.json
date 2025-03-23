@@ -14,7 +14,7 @@
         "random_forest_regressor": {
             "hyperparameters": {
                 "min_samples_leaf": 2,
-                "n_estimators": 400
+                "n_estimators": 600
             },
             "param_grid": {
                 "min_samples_leaf": [

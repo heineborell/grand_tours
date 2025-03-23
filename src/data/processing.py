@@ -1,3 +1,5 @@
+import json
+import os
 import sqlite3
 
 import numpy as np
@@ -7,33 +9,31 @@ from rich import print as print
 from data.database import get_rider
 
 
-def fetch_riders(DB_PATH, tour, year):
+def fetch_riders(db_path, tour, year):
+    # Load config
+    with open(db_path, "r") as f:
+        db_path = json.loads(f.read())
+
+    grand_tours_db_path = os.path.expanduser(db_path["global"]["grand_tours_db_path"])
+
     """Enter tour and year e.g. 2024, tdf to get the list of rider_ids"""
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(grand_tours_db_path)
     query = f"SELECT DISTINCT(athlete_id) FROM strava_table WHERE tour_year='{tour}-{year}'"
     riders = conn.execute(query).fetchall()
     return [rider[0] for rider in riders]
 
 
-def create_dataframe(rider_ids, tour, year, grand_tours_db, training_db_path, training=True):
+def create_dataframe(rider_ids, tour, year, db_path, training=True):
     """Given a list of riders get the ride dataframe and concat all dfs."""
     print(f"Creating dataframe training:{training}")
     dfs = []
     for r in rider_ids:
-        rider = get_rider(r, tour, year, grand_tours_db, training_db_path, training)
+        rider = get_rider(r, tour, year, db_path, training)
         if rider:  # Ensure rider is not None
             dfs.append(rider.to_dataframe())
 
     dfs = [df for df in dfs if not df.empty if not df.empty and not df.isna().all().all()]
     dfs = [df.map(lambda x: np.nan if (x is pd.NA or x is None) else x) for df in dfs]
-
-    for i, df in enumerate(dfs):
-        print(f"DataFrame {i}:")
-        print(df)
-        print("Shape:", df.shape)
-        print("Empty:", df.empty)
-        print("All-NA:", df.isna().all().all())
-        print("-" * 20)
 
     # Optionally, concatenate all DataFrames into one
     if dfs:

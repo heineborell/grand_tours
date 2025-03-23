@@ -1,4 +1,5 @@
 import json
+import os
 import sqlite3
 from datetime import datetime
 from typing import Optional
@@ -90,7 +91,13 @@ GROUP BY tour_year;
     return date_list
 
 
-def get_rider(athlete_id, tour, year, grand_tours_db_path, training_db_path, training=True):
+def get_rider(athlete_id, tour, year, db_path, training=True):
+    # Load config
+    with open(db_path, "r") as f:
+        db_path = json.loads(f.read())
+
+    grand_tours_db_path = os.path.expanduser(db_path["global"]["grand_tours_db_path"])
+    training_db_path = os.path.expanduser(db_path["global"]["training_db_path"])
     # Fetch rider name
     with sqlite3.connect(grand_tours_db_path) as conn:
         cursor = conn.cursor()

@@ -1,10 +1,16 @@
+import json
+
 import numpy as np
 from rich import print
 
 from training.trainer import Trainer
 
 
-def kfold_split_train(X_train, config, features, target, kfold):
+def kfold_split_train(X_train, config_path, kfold):
+    # Load config
+    with open(config_path, "r") as f:
+        config = json.loads(f.read())
+
     # make empty rmse holder
     models = list(config["models"].keys())
     cv_rmses = np.zeros((5, len(models)))
@@ -19,11 +25,11 @@ def kfold_split_train(X_train, config, features, target, kfold):
         for j, model in enumerate(models):
             print(f"------------------\n {model}")
             trainer = Trainer(model, config["models"][model]["hyperparameters"])
-            trainer.train(X_train_train[features], X_train_train[target])
-            score = trainer.evaluate(X_holdout[features], X_holdout[target])
+            trainer.train(X_train_train[config["features"]], X_train_train[config["target"]])
+            score = trainer.evaluate(X_holdout[config["features"]], X_holdout[config["target"]])
             print(f"RMSE: {score}")
 
-            # record mse
+            # record rmse
             cv_rmses[i, j] = score
 
     print(cv_rmses)

@@ -25,7 +25,7 @@ def param_search(X_train, config_path):
             time.sleep(1)  # Adjust the sleep time as needed
 
         # Track the progress of tasks using tqdm
-        with tqdm(total=len(futures), desc="Processing tasks", unit="task") as pbar:
+        with tqdm(total=len(futures), desc="Processing gridsearch", unit="task") as pbar:
             for future in concurrent.futures.as_completed(futures):
                 try:
                     task_id = futures[future]

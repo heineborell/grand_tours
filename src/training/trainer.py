@@ -12,6 +12,9 @@ class Trainer:
         if hyperparams is None:
             hyperparams = {}  # Default to an empty dictionary
 
+        if hyperparams is None and model_name == "xgboost":
+            hyperparams = {"tree_method": "gpu_hist"}  # Default to an empty dictionary
+
         if model_name == "linear_regression":
             return LinearRegressionModel()
         elif model_name == "random_forest_regressor":

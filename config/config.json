@@ -13,7 +13,7 @@
         "random_forest_regressor": {
             "hyperparameters": {
                 "min_samples_leaf": 2,
-                "n_estimators": 300
+                "n_estimators": 600
             },
             "param_grid": {
                 "min_samples_leaf": [
@@ -31,8 +31,8 @@
         "xgboost": {
             "hyperparameters": {
                 "learning_rate": 0.1,
-                "max_depth": 7,
-                "n_estimators": 300
+                "max_depth": 3,
+                "n_estimators": 500
             },
             "param_grid": {
                 "max_depth": [

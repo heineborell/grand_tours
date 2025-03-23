@@ -12,7 +12,9 @@ dependencies = [
     "pydantic",
     "scikit-learn",
     'rich',
-    "xgboost"
+    "xgboost",
+    "tdqm",
+
 ]
 
 [project.optional-dependencies]

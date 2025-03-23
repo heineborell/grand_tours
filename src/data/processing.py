@@ -44,6 +44,8 @@ def create_dataframe(rider_ids, tour, year, db_path, training=True):
 
 def clean_dataframe(data):
     data = data[(data["distance"] > 0) & (data["elevation"] > 0)].dropna(subset=["time"])
+    if "avg_power" in data.columns:
+        data = data.dropna(subset=["avg_power"])
     return data
 
 

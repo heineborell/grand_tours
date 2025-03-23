@@ -2,7 +2,8 @@
     "features": [
         "distance",
         "elevation",
-        "time_delta"
+        "time_delta",
+        "avg_power"
     ],
     "target": "time",
     "models": {

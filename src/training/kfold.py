@@ -1,6 +1,7 @@
 import json
 
 import numpy as np
+import pandas as pd
 from rich import print
 
 from training.trainer import Trainer
@@ -11,6 +12,8 @@ def kfold_split_train(X_train, config_path, kfold):
     with open(config_path, "r") as f:
         config = json.loads(f.read())
 
+    # create empty dataframe
+    df = pd.DataFrame(columns=["Model", "cv_rmse", "features", "x_train_length"])
     # make empty rmse holder
     models = list(config["models"].keys())
     cv_rmses = np.zeros((5, len(models)))
@@ -32,4 +35,7 @@ def kfold_split_train(X_train, config_path, kfold):
             # record rmse
             cv_rmses[i, j] = score
 
-    print(cv_rmses)
+    df = pd.DataFrame(
+        {"Model": models, "cv_rmse": np.mean(cv_rmses, axis=0), "features": len(models) * [config["features"]]}
+    )
+    print(df)

@@ -25,13 +25,16 @@ def param_search(X_train, config_path):
             time.sleep(1)  # Adjust the sleep time as needed
 
         # Track the progress of tasks using tqdm
-        for future in tqdm(concurrent.futures.as_completed(futures), total=len(futures), desc="Processing tasks"):
-            try:
-                result = future.result()
-                print(f"[turquoise2] Task result: {result} [/turquoise2]")
-            except Exception as e:
-                task_id = futures[future]
-                print(f"[bright red] Task {task_id} generated an exception: {e} [/bright red]")
+        with tqdm(total=len(futures), desc="Processing tasks", unit="task") as pbar:
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    task_id = futures[future]
+                    pbar.set_postfix(task=task_id)  # Update progress bar with current task
+                except Exception as e:
+                    task_id = futures[future]
+                    print(f"[bright red] Task {task_id} generated an exception: {e} [/bright red]")
+                finally:
+                    pbar.update(1)  # Move the progress bar forward
 
 
 def gridder(model, X_train, config_path):

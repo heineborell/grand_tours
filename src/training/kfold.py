@@ -34,8 +34,14 @@ def kfold_split_train(X_train, config_path, kfold):
 
             # record rmse
             cv_rmses[i, j] = score
+            xtrain_len = len(X_train_train[config["features"]])
 
     df = pd.DataFrame(
-        {"Model": models, "cv_rmse": np.mean(cv_rmses, axis=0), "features": len(models) * [config["features"]]}
+        {
+            "Model": models,
+            "cv_rmse": np.mean(cv_rmses, axis=0),
+            "x_tr_tr_len": xtrain_len,
+            "features": len(models) * [config["features"]],
+        }
     )
     print(df)

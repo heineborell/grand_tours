@@ -1,8 +1,4 @@
 {
-    "global": {
-        "grand_tours_db_path": "~/iCloud/Research/Data_Science/Projects/data/grand_tours.db",
-        "training_db_path": "~/iCloud/Research/Data_Science/Projects/data/training_merged.db"
-    },
     "features": [
         "distance",
         "elevation",
@@ -17,7 +13,7 @@
         "random_forest_regressor": {
             "hyperparameters": {
                 "min_samples_leaf": 2,
-                "n_estimators": 600
+                "n_estimators": 400
             },
             "param_grid": {
                 "min_samples_leaf": [

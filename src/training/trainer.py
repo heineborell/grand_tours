@@ -1,5 +1,3 @@
-from rich import print
-
 from models.linear_regression import LinearRegressionModel
 from models.linearsvr import LinearSVRModel
 from models.random_forest import RandomForestRegressorModel
@@ -26,9 +24,7 @@ class Trainer:
             raise ValueError(f"Unknown model: {model_name}")
 
     def train(self, X_train, y_train):
-        print(f"[bold green] Length of X_train: [/bold green]{len(X_train)}")
         self.model.train(X_train, y_train)
-        print("[bold blue] Training finished [/bold blue]")
 
     def evaluate(self, X_test, y_test):
         return self.model.evaluate(X_test, y_test)

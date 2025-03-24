@@ -3,7 +3,7 @@ from pathlib import Path
 from rich import print
 from sklearn.model_selection import KFold, train_test_split
 
-from data.data_loader import load_data
+from data.data_loader import get_data_info, load_data
 from data.processing import fetch_riders
 from training.gridsearch import param_search
 from training.kfold import kfold_split_train
@@ -17,21 +17,11 @@ if __name__ == "__main__":
     # # Load data
     data = load_data(tour, year, db_path, training=True).dropna(subset=["avg_power"])
 
-    print(f"The total number of riders in training dataset is {len(data['strava_id'].unique())}.")
     print(f"The total number of riders in the race dataset is {len(fetch_riders(db_path, tour, year))}.")
 
-    no_of_activities = (
-        data.groupby("strava_id")
-        .size()
-        .sort_values(ascending=True)
-        .reset_index(name="activity_count")
-        .sort_values("activity_count", ascending=True)
-    )
-    print((no_of_activities))
-    # plt.figure(figsize=(6, 6))
-    # plt.hist(no_of_activities["strava_id"],no_of_activities[], bins=len(no_of_activities))
-    # plt.show()
-    for rider in list(no_of_activities["strava_id"])[-4:-1]:
+    sorted_list = get_data_info(data)
+
+    for rider in list(sorted_list["strava_id"])[-4:-1]:
         rider_data = data.loc[data["strava_id"] == rider]
 
         # Splitting train and test

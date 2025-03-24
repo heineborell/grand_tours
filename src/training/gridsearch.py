@@ -81,13 +81,35 @@ def gridder(model, X_train, config_path, pbar):
 
 
 def json_writer(best_params, model, config_path):
-    # Load config
+    # Load base config again
     with open(config_path, "r") as f:
         config = json.loads(f.read())
+
+    tour = config["tour"]
+    year = config["year"]
+
+    # change to the parameters you found from gridsearch
     config["models"][model]["hyperparameters"] = best_params
+
+    # delete parameter grid search data
+    json_cleaner(config)
     json_data = json.dumps(config, indent=4)
-    with open(
-        config_path,
-        "w",
-    ) as f:
-        f.write(json_data)
+
+    # save to the new json file (dropped the hyperparameter search range)
+    if config["training"]:
+        with open(
+            config_path.parent / f"config_{tour}_training-{year}.json",
+            "w",
+        ) as f:
+            f.write(json_data)
+    else:
+        with open(
+            config_path.parent / f"config_{tour}-{year}.json",
+            "w",
+        ) as f:
+            f.write(json_data)
+
+
+def json_cleaner(json_data):
+    for model in json_data["models"].keys():
+        del json_data["models"][model]["param_grid"]

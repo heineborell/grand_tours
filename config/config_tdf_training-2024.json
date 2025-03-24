@@ -1,0 +1,21 @@
+{
+    "training": true,
+    "tour": "tdf",
+    "year": "2024",
+    "features": [
+        "distance",
+        "elevation",
+        "time_delta"
+    ],
+    "target": "time",
+    "models": {
+        "linear_regression": {
+            "hyperparameters": null
+        },
+        "linearsvr": {
+            "hyperparameters": {
+                "gamma": 3
+            }
+        }
+    }
+}

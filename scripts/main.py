@@ -8,7 +8,7 @@ from training.gridsearch import param_search
 from training.kfold import kfold_split_train
 
 if __name__ == "__main__":
-    config_path = Path("config/config_power.json")
+    config_path = Path("config/config_noxgb.json")
     db_path = Path("config/db_path.json")
 
     # # Load data

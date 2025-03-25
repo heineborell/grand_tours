@@ -1,6 +1,7 @@
 import concurrent.futures
 import json
 import time
+from pathlib import Path
 
 from rich import print
 from sklearn.model_selection import GridSearchCV
@@ -99,27 +100,50 @@ def json_writer(config_path, best_params, rider_id=None):
     for model in best_params:
         config["models"][model]["hyperparameters"] = best_params[model]
 
+    config["strava_id"] = rider_id
     # delete parameter grid search data
     json_cleaner(config)
-    json_data = json.dumps(config, indent=4)
-    print(json_data)
+    print(config)
 
     # save to the new json file (dropped the hyperparameter search range) if
-    # it is training it saves _training if its race it save as in else
+    # it is training it saves config_{tour}_training-{year}_all.json
+    # if its race it save as config_{tour}_{year}_all.json
     if config["training"] and rider_id is None:
-        with open(
-            config_path.parent / f"config_{tour}_training-{year}_all.json",
-            "w",
-        ) as f:
-            f.write(json_data)
+        json_saver(config_path.parent / f"config_{tour}_training-{year}_all.json", config)
     elif not config["training"] and rider_id is None:
-        with open(
-            config_path.parent / f"config_{tour}-{year}_all.json",
-            "w",
-        ) as f:
-            f.write(json_data)
+        json_saver(config_path.parent / f"config_{tour}-{year}_all.json", config)
+    elif config["training"] and rider_id is not None:
+        extend_json_file(config_path.parent / f"config_{tour}_training-{year}_individual.json", config)
+
+
+def json_saver(path, config):
+    json_data = json.dumps(config, indent=4)
+    with open(
+        path,
+        "w",
+    ) as f:
+        f.write(json_data)
 
 
 def json_cleaner(json_data):
     for model in json_data["models"].keys():
         del json_data["models"][model]["param_grid"]
+
+
+def extend_json_file(file_path, new_data):
+    # Check if the file exists
+    if Path.exists(file_path):
+        # Read existing data
+        with open(file_path, "r") as f:
+            try:
+                data = json.load(f)
+            except json.JSONDecodeError:
+                data = []  # Default to empty dict if file is corrupted or empty
+    else:
+        data = []
+
+    data.append(new_data)
+
+    # Write updated data back to the file
+    with open(file_path, "w") as f:
+        json.dump(data, f)

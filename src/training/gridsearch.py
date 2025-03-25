@@ -17,6 +17,7 @@ def param_search(X_train, config_path):
 
     # Dictionary to track progress bars for each model
     thread_pbars = {}
+    results = {}
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
         futures = {}
@@ -32,6 +33,8 @@ def param_search(X_train, config_path):
             for future in concurrent.futures.as_completed(futures):
                 try:
                     task_id = futures[future]
+                    result = future.result()
+                    results[task_id] = result
                     pbar.set_postfix(task=task_id)  # Update progress bar with current task
                 except Exception as e:
                     task_id = futures[future]
@@ -41,6 +44,8 @@ def param_search(X_train, config_path):
                     pbar.update(1)  # Move the progress bar forward
                     # Close the individual progress bar
                     thread_pbars[task_id].close()
+
+    return results  # Return all results after completion
 
 
 def gridder(model, X_train, config_path, pbar):
@@ -52,35 +57,37 @@ def gridder(model, X_train, config_path, pbar):
     if not param_grid:
         print(f"[bold red] No hyperparameter for {model} [/bold red]")
         pbar.update(100)  # Complete the progress bar
-        return
+        return None, model
 
-    # Create a GridSearchCV object
-    model_bare = Trainer(model, hyperparams=None)
-    grid_search = GridSearchCV(
-        estimator=model_bare._get_model(model, hyperparams=None).model,
-        param_grid=param_grid,
-        cv=5,
-        scoring="neg_root_mean_squared_error",
-    )
+    else:
+        # Create a GridSearchCV object
+        model_bare = Trainer(model, hyperparams=None)
+        grid_search = GridSearchCV(
+            estimator=model_bare._get_model(model, hyperparams=None).model,
+            param_grid=param_grid,
+            cv=5,
+            scoring="neg_root_mean_squared_error",
+        )
 
-    # Update progress to show we're starting the fit
-    pbar.update(10)
-    pbar.refresh()
-    # Fit the grid search to the training data
-    grid_search.fit(X_train[config["features"]], X_train[config["target"]])
+        # Update progress to show we're starting the fit
+        pbar.update(10)
+        pbar.refresh()
+        # Fit the grid search to the training data
+        grid_search.fit(X_train[config["features"]], X_train[config["target"]])
 
-    # Update progress to show we're done fitting
-    pbar.update(80)
+        # Update progress to show we're done fitting
+        pbar.update(80)
 
-    # Get the best parameters
-    best_params_SVR = grid_search.best_params_
-    json_writer(best_params_SVR, model, config_path)
+        # Get the best parameters
+        best_params = grid_search.best_params_
 
-    # Complete the progress
-    pbar.update(10)
+        # Complete the progress
+        pbar.update(10)
+
+        return best_params, model
 
 
-def json_writer(best_params, model, config_path):
+def json_writer(config_path, best_params, model, rider_id=None):
     # Load base config again
     with open(config_path, "r") as f:
         config = json.loads(f.read())
@@ -94,6 +101,7 @@ def json_writer(best_params, model, config_path):
     # delete parameter grid search data
     json_cleaner(config)
     json_data = json.dumps(config, indent=4)
+    print(json_data)
 
     # save to the new json file (dropped the hyperparameter search range) if
     # it is training it saves _training if its race it save as in else

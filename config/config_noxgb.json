@@ -15,7 +15,7 @@
         },
         "linearsvr": {
             "hyperparameters": {
-                "gamma": 3
+                "gamma": 2
             },
             "param_grid": {
                 "gamma": [

@@ -28,6 +28,7 @@ if __name__ == "__main__":
         X_train, X_test = train_test_split(rider_data, test_size=0.2, random_state=42)
 
         params = param_search(X_train, config_path)
+        print(params)
         # json_writer(config_path, **params)
 
         # kfold = KFold(n_splits=5, shuffle=True, random_state=31)

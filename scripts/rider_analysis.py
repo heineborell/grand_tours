@@ -9,7 +9,7 @@ from training.gridsearch import param_search
 from training.kfold import kfold_split_train
 
 if __name__ == "__main__":
-    config_path = Path("config/config_power.json")
+    config_path = Path("config/config_noxgb.json")
     db_path = Path("config/db_path.json")
     tour = "tdf"
     year = 2024
@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     sorted_list = get_data_info(data)
 
-    for rider in list(sorted_list["strava_id"])[-4:-1]:
+    for rider in list(sorted_list["strava_id"])[-15:-1]:
         rider_data = data.loc[data["strava_id"] == rider]
 
         # Splitting train and test

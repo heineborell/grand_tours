@@ -95,7 +95,8 @@ def json_writer(best_params, model, config_path):
     json_cleaner(config)
     json_data = json.dumps(config, indent=4)
 
-    # save to the new json file (dropped the hyperparameter search range)
+    # save to the new json file (dropped the hyperparameter search range) if
+    # it is training it saves _training if its race it save as in else
     if config["training"]:
         with open(
             config_path.parent / f"config_{tour}_training-{year}.json",

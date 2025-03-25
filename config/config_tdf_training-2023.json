@@ -10,19 +10,11 @@
     "target": "time",
     "models": {
         "linear_regression": {
-            "hyperparameters": null,
-            "param_grid": null
+            "hyperparameters": null
         },
         "linearsvr": {
             "hyperparameters": {
                 "gamma": 3
-            },
-            "param_grid": {
-                "gamma": [
-                    3,
-                    5,
-                    8
-                ]
             }
         }
     }

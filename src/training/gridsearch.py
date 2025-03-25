@@ -57,7 +57,7 @@ def gridder(model, X_train, config_path, pbar):
     if not param_grid:
         print(f"[bold red] No hyperparameter for {model} [/bold red]")
         pbar.update(100)  # Complete the progress bar
-        return None, model
+        return None
 
     else:
         # Create a GridSearchCV object
@@ -84,10 +84,10 @@ def gridder(model, X_train, config_path, pbar):
         # Complete the progress
         pbar.update(10)
 
-        return best_params, model
+        return best_params
 
 
-def json_writer(config_path, best_params, model, rider_id=None):
+def json_writer(config_path, best_params, rider_id=None):
     # Load base config again
     with open(config_path, "r") as f:
         config = json.loads(f.read())
@@ -96,7 +96,8 @@ def json_writer(config_path, best_params, model, rider_id=None):
     year = config["year"]
 
     # change to the parameters you found from gridsearch
-    config["models"][model]["hyperparameters"] = best_params
+    for model in best_params:
+        config["models"][model]["hyperparameters"] = best_params[model]
 
     # delete parameter grid search data
     json_cleaner(config)
@@ -105,15 +106,15 @@ def json_writer(config_path, best_params, model, rider_id=None):
 
     # save to the new json file (dropped the hyperparameter search range) if
     # it is training it saves _training if its race it save as in else
-    if config["training"]:
+    if config["training"] and rider_id is None:
         with open(
-            config_path.parent / f"config_{tour}_training-{year}.json",
+            config_path.parent / f"config_{tour}_training-{year}_all.json",
             "w",
         ) as f:
             f.write(json_data)
-    else:
+    elif not config["training"] and rider_id is None:
         with open(
-            config_path.parent / f"config_{tour}-{year}.json",
+            config_path.parent / f"config_{tour}-{year}_all.json",
             "w",
         ) as f:
             f.write(json_data)

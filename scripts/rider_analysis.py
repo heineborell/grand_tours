@@ -10,7 +10,7 @@ from training.gridsearch import json_writer, param_search
 if __name__ == "__main__":
     db_path = Path("config/db_path.json")
     tour = "tdf"
-    year = 2022
+    year = 2023
 
     config_path = Path(config_loader(tour, year, "config/config.json"))
 
@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     sorted_list = get_data_info(data)
 
-    for rider in list(sorted_list["strava_id"])[-3:-1]:
+    for rider in list(sorted_list["strava_id"])[-20:-1]:
         rider_data = data.loc[data["strava_id"] == rider]
 
         # Splitting train and test

@@ -16,17 +16,25 @@ def param_search(X_train, config_path):
         config = json.loads(f.read())
     models = list(config["models"].keys())
 
-    # Dictionary to track progress bars for each model
+    # Pack X_train and config_path into kwargs
+    kwargs = {"X_train": X_train, "config_path": config_path}
+    results = threadder(gridder, models, **kwargs)
+
+    return results  # Return all results after completion
+
+
+def threadder(thread_func, list_items, **kwargs):
+    # Dictionary to track progress bars for each item in item list
     thread_pbars = {}
     results = {}
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
         futures = {}
         # Submit tasks and add them to futures
-        for i, model in enumerate(models):
-            # Create a progress bar for each model
-            thread_pbars[model] = tqdm(total=100, desc=f"{model}", position=i + 1, leave=False)
-            futures[executor.submit(gridder, model, X_train, config_path, thread_pbars[model])] = model
+        for i, item in enumerate(list_items):
+            # Create a progress bar for each item
+            thread_pbars[item] = tqdm(total=100, desc=f"{item}", position=i + 1, leave=False)
+            futures[executor.submit(thread_func, item, thread_pbars[item], **kwargs)] = item
             time.sleep(1)  # Adjust the sleep time as needed
 
         # Track the progress of tasks using tqdm for total progress
@@ -45,11 +53,13 @@ def param_search(X_train, config_path):
                     pbar.update(1)  # Move the progress bar forward
                     # Close the individual progress bar
                     thread_pbars[task_id].close()
+    return results
 
-    return results  # Return all results after completion
 
-
-def gridder(model, X_train, config_path, pbar):
+def gridder(model, pbar, **kwargs):
+    # Extract X_train and config_path from kwargs
+    X_train = kwargs.get("X_train")
+    config_path = kwargs.get("config_path")
     # Load config
     with open(config_path, "r") as f:
         config = json.loads(f.read())

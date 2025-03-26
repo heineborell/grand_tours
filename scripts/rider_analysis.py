@@ -3,15 +3,16 @@ from pathlib import Path
 from rich import print
 from sklearn.model_selection import train_test_split
 
-from data.data_loader import get_data_info, load_data
+from data.data_loader import config_loader, get_data_info, load_data
 from data.processing import fetch_riders
 from training.gridsearch import json_writer, param_search
 
 if __name__ == "__main__":
-    config_path = Path("config/config.json")
     db_path = Path("config/db_path.json")
     tour = "tdf"
-    year = 2024
+    year = 2022
+
+    config_path = Path(config_loader(tour, year, "config/config.json"))
 
     # # Load data
     data = load_data(tour, year, db_path, training=True).dropna(subset=["avg_power"])

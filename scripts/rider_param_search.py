@@ -29,6 +29,3 @@ if __name__ == "__main__":
 
         params = param_search(X_train=X_train, config_path=config_path)
         json_writer(config_path, params, rider_id=rider)
-
-        # kfold = KFold(n_splits=5, shuffle=True, random_state=31)
-        # kfold_split_train(X_train, config_path, kfold)

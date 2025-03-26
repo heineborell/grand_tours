@@ -1,5 +1,3 @@
-import json
-
 import numpy as np
 import pandas as pd
 from rich import print
@@ -8,11 +6,7 @@ from tqdm import tqdm
 from training.trainer import Trainer
 
 
-def kfold_split_train(X_train, config_path, kfold):
-    # Load config
-    with open(config_path, "r") as f:
-        config = json.loads(f.read())
-
+def kfold_split_train(X_train, config, kfold):
     # create empty dataframe
     df = pd.DataFrame(columns=["Model", "cv_rmse", "features", "x_train_length"])
     # make empty rmse holder

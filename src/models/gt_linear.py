@@ -30,6 +30,7 @@ def train_linear_regression(X, y, itt_mask):
         "model": model,
         "X_train": X_train,
         "y_train": y_train,
+        "num_test": len(X_test),
         "mae": mean_absolute_error(y_test, y_pred),
         "mse": mean_squared_error(y_test, y_pred),
         "mape": mean_absolute_percentage_error(y_test, y_pred),

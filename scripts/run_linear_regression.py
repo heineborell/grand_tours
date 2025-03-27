@@ -24,15 +24,19 @@ def linear_regression():
     df = fetch_data(gt_db_path, table_name,fit_params)
     # df = fetch_distance_and_time_data(gt_db_path, table_name,fit_params)
     rows, cols = df.shape
-    print(f"Number of rows: {rows}, Number of columns: {cols}")
+    print(f"After fetch:  rows= {rows}, columns= {cols}")
 
     print("\nFiltering out using outliers.csv...")
     outlier_path = "data/outliers.csv"
     df = apply_outlier_filter(df, outlier_path, table_name)
+    rows, cols = df.shape
+    print(f"After outlier filter:  rows= {rows}, columns= {cols}")
     #
     print("\nPreprocessing data...")
     X, y, itt_mask = preprocess_regression_data(df, fit_params)
     #
+    print(f"After preprocess  len(X)= {len(X)}, len(y)= {len(y)}")
+
     print("\nTraining linear regerssion model...")
     lin_reg_params = train_linear_regression(X, y, itt_mask)
     #

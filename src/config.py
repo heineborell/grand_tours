@@ -3,10 +3,14 @@
 import numpy as np
 
 PLOT_PATHS = {
-    "linear": "plots/lin_regression/",
-    "poly": "plots/poly_regression/",
-    "multi": "plots/multivariate_regression/",
-    "eda": "plots/exploratory_plots/"
+    "linear": "plots/linear_reg/",
+    "poly": "plots/polynomial_reg/",
+    "multi": "plots/multivariate_reg/",
+    "gt_eda": "plots/grand_tours_eda/"
+}
+
+OUTPUT_PATHS = {
+    "output": "output/model_logs/",
 }
 
 DB_PATHS = {

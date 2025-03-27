@@ -1,10 +1,9 @@
 #src/plotting/plot_linear_regression.py
 
-import pandas as pd
 import numpy as np
 import seaborn as sns
 ##
-from src.config import PLOT_PATHS, get_tour_attributes
+from src.config import PLOT_PATHS,OUTPUT_PATHS, get_tour_attributes
 from src.utils.time_utils import seconds_to_hms
 ##
 import matplotlib.pyplot as plt
@@ -25,8 +24,6 @@ def summarize_and_plot_linear_regression(table_name, fit_params, lin_reg_params)
     model = lin_reg_params['model']
     X_train = lin_reg_params['X_train']
     y_train = lin_reg_params['y_train']
-    num_train = lin_reg_params['num_train']
-    num_test = lin_reg_params['num_test']
     mae = lin_reg_params['mae']
     mse = lin_reg_params['mse']
     mape = lin_reg_params['mape']
@@ -40,14 +37,14 @@ def summarize_and_plot_linear_regression(table_name, fit_params, lin_reg_params)
     ##
     itt_txt = "ITT_T" if fit_params['Include ITT'] else "ITT_F"
     norm_txt = "N_T" if fit_params['Normalize']  else "N_F"
-    winners_txt = "WO_T" if fit_params['Winners only']  else "WO_F"
     
     #-------------------
     fig, ax = plt.subplots(figsize=(10, 6.5))
     # plot data
     ax.scatter(X_train, y_train, color=tour_color, edgecolors='k', s=15, label=f"{tour_name} Data")
     if len(itt_indices) > 0:
-        ax.plot(X_train[itt_indices], y_train[itt_indices], marker='o',  mfc='b', mec='k', ms=4, ls='None', label=f"{tour_name} ITT Data")
+        print(f"\nlen itt_indices = {len(itt_indices)}")
+        ax.plot(X_train.iloc[itt_indices], y_train.iloc[itt_indices], marker='o',  mfc='b', mec='k', ms=4, ls='None', label=f"{tour_name} ITT Data")
     # plot prediction-equation
     y_lin_pred = model.predict(X_train)
     ax.plot(X_train, y_lin_pred, color='b', lw=1.5, label='Regression Line')
@@ -63,8 +60,8 @@ def summarize_and_plot_linear_regression(table_name, fit_params, lin_reg_params)
             f"RMSE: {rmse:.2f} min ({seconds_to_hms(rmse * 60)})\n"
             f"R²: {r2:.3f}\n"
             f"{equation}\n"
-            f"N$_{{train}}$: {num_train}\n"
-            f"N$_{{test}}$: {num_test}\n"
+            f"N$_{{train}}$: {len(X_train)}\n"
+            f"N$_{{test}}$: {lin_reg_params['num_test']}\n"
             f"{"-"*30}\n"
             f"{fit_text}")
     ax.text(0.05, 0.95, summary_text, transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=dict(boxstyle='round,pad=0.3', ec='black', fc='white'))
@@ -76,11 +73,11 @@ def summarize_and_plot_linear_regression(table_name, fit_params, lin_reg_params)
     ax.tick_params(axis='both', which='minor', labelsize=10)
     ax.legend(fontsize=12)
     fig.tight_layout()
-    plt.savefig(f"plots/lin_regression/{tour_name}_Linear_Regression_{itt_txt}_{norm_txt}_{winners_txt}.pdf", bbox_inches='tight')
+    plt.savefig(f"{PLOT_PATHS['linear']}{tour_name}_Linear_Regression_{itt_txt}_{norm_txt}.png", bbox_inches='tight')
     plt.show()
     #-------------------
 
-    output_path = f"output/model_logs/{tour_name}_multivariate_regression_summary.txt"
+    output_path = f"{OUTPUT_PATHS['output']}{tour_name}_multivariate_regression_summary.txt"
     with open(output_path, "w") as f:
         f.write("--- Regression Summary ---\n")
         f.write(f"Features used: {feature_list}\n")

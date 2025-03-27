@@ -39,6 +39,7 @@ class Rider(BaseModel):
                     "avg_power": ride.avg_power,
                     "time": ride.time,
                     "tour_year": ride.tour_year,
+                    "stage": ride.stage,
                     "ride_day": ride.ride_date,
                     "race_start_day": ride.race_start_day,
                     "segments": ride.segments,

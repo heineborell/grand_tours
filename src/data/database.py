@@ -50,6 +50,12 @@ def mdy_to_ymd(d):
     return date
 
 
+def remove_km(value):
+    if not value.endswith("km"):
+        raise ValueError(f"Invalid value: {value} (does not end with 'km')")
+    return value[:-2]  # Remove last two characters
+
+
 def get_first_day_race(database_path):
     """Returns the first day of the races."""
 
@@ -156,11 +162,24 @@ def check_segment(row, drop_list, training):
 def create_ride(row, training, race_day_list_full, race_day_list, segment_data):
     ride_data = json.loads(row[4 if training else -1])
     segment_name_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_name")]
+    segment_dist_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_distance")]
     segment_time_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_time")]
+    segment_vert_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_vert")]
+    segment_grade_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_grade")]
     segments = []
     if segment_data:
-        for seg_name, seg_time in zip(segment_name_list, segment_time_list):
-            segments.append(Segment(name=seg_name, time=hms_to_seconds(seg_time)))
+        for seg_name, seg_dist, seg_time, seg_vert, seg_grade in zip(
+            segment_name_list, segment_dist_list, segment_time_list, segment_vert_list, segment_grade_list
+        ):
+            segments.append(
+                Segment(
+                    name=seg_name,
+                    dist=remove_km(seg_dist),
+                    time=hms_to_seconds(seg_time),
+                    vert=int(seg_vert[:-1].replace(",", "")),
+                    grade=float(seg_grade[:-1]),
+                )
+            )
     return Ride(
         activity_id=row[0],
         distance=ride_data["dist"].split(" ")[0],

@@ -157,6 +157,12 @@ def check_segment(row, drop_list, training):
 
 def create_ride(row, training, race_day_list_full, race_day_list, segment_data):
     ride_data = json.loads(row[4 if training else -1])
+    segment_name_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_name")]
+    # segment_time_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_time")]
+    segments = []
+    if segment_data:
+        for seg in segment_name_list:
+            segments.append(Segment(name=seg))
     return Ride(
         activity_id=row[0],
         distance=ride_data["dist"].split(" ")[0],
@@ -167,7 +173,5 @@ def create_ride(row, training, race_day_list_full, race_day_list, segment_data):
         ride_date=mdy_to_ymd(row[3 if training else 5]),
         race_start_day=race_day_list_full[race_day_list.index(row[2].split("_")[0] + row[2][12:])][0],
         **({"stage": row[6].strip()} if not training else {}),
-        segments=[Segment(name=segments) for segments in json.loads(row[5 if training else 7]).get("segment_name")]
-        if segment_data
-        else [],
+        segments=segments,
     )

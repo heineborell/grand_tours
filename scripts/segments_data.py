@@ -12,5 +12,5 @@ if __name__ == "__main__":
     year = 2023
 
     # Load data
-    data = load_data(tour, year, db_path, training=True)
+    data = load_data(tour, year, db_path, training=False)
     print(data)

@@ -131,7 +131,7 @@ def get_rider(athlete_id, tour, year, db_path, training=True, segment_data=False
     race_day_list_full, race_day_list = get_race_day(grand_tours_db_path)
     drop_list = []
     if segment_data:
-        [check_segment(row, drop_list) for row in ride_rows]
+        [check_segment(row, drop_list, training) for row in ride_rows]
 
     # Convert SQL rows to Pydantic models
     ride_rows = [row for row in ride_rows if row[0] not in drop_list]
@@ -148,9 +148,9 @@ def get_race_day(grand_tours_db_path):
     return race_day_list_full, race_day_list
 
 
-def check_segment(row, drop_list):
+def check_segment(row, drop_list, training):
     try:
-        ([Segment(name=segments) for segments in json.loads(row[7]).get("segment_name")],)
+        ([Segment(name=segments) for segments in json.loads(row[5 if training else 7]).get("segment_name")],)
     except TypeError:
         drop_list.append(row[0])
 
@@ -167,5 +167,7 @@ def create_ride(row, training, race_day_list_full, race_day_list, segment_data):
         ride_date=mdy_to_ymd(row[3 if training else 5]),
         race_start_day=race_day_list_full[race_day_list.index(row[2].split("_")[0] + row[2][12:])][0],
         **({"stage": row[6].strip()} if not training else {}),
-        segments=[Segment(name="dfsdafa")] if segment_data else [],
+        segments=[Segment(name=segments) for segments in json.loads(row[5 if training else 7]).get("segment_name")]
+        if segment_data
+        else [],
     )

@@ -3,14 +3,14 @@ import json
 from data.processing import clean_dataframe, create_dataframe, create_features, fetch_riders
 
 
-def load_data(tour, year, db_path, training=True):
+def load_data(tour, year, db_path, training=True, segment_data=False):
     """Loads pandas dataframe given tour, year, database path"""
     # first fetch the riders given tour and year
     rider_list = fetch_riders(db_path, tour, year)
 
     # create pandas dataframe given the riders, tour, year and if its training or not.
     # training true will give race datas for the tour and year.
-    full_df = create_dataframe(rider_list, tour, year, db_path, training)
+    full_df = create_dataframe(rider_list, tour, year, db_path, training, segment_data)
 
     # cleaning dataframe (this one takes out the activities that have distance=elevation=0)
     # which are rides on stationary trainers

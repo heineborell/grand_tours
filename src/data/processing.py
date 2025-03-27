@@ -24,12 +24,12 @@ def fetch_riders(db_path, tour, year):
     return [rider[0] for rider in riders]
 
 
-def create_dataframe(rider_ids, tour, year, db_path, training=True):
+def create_dataframe(rider_ids, tour, year, db_path, training=True, segment_data=False):
     """Given a list of riders get the ride dataframe and concat all dfs."""
     print(f"Creating dataframe training:{training}")
     dfs = []
     for r in rider_ids:
-        rider = get_rider(r, tour, year, db_path, training)
+        rider = get_rider(r, tour, year, db_path, training, segment_data)
         if rider:  # Ensure rider is not None
             dfs.append(rider.to_dataframe())
 

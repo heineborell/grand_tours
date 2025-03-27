@@ -2,6 +2,8 @@ __pycache__/
 *.pyc
 *.png
 *.docx
+*.key
+testing/
 data/
 *.db
 plots/*/*

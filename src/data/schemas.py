@@ -6,7 +6,10 @@ from pydantic import BaseModel, Field
 
 class Segment(BaseModel):
     name: str
-    time: Optional[float] = None
+    dist: Optional[float] = None
+    time: Optional[int] = None
+    vert: Optional[int] = None
+    grade: Optional[float] = None
 
 
 class Ride(BaseModel):

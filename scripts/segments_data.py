@@ -2,6 +2,7 @@ from pathlib import Path
 
 from rich import print
 
+from data.data_loader import load_data
 from data.database import get_rider
 
 if __name__ == "__main__":
@@ -12,7 +13,7 @@ if __name__ == "__main__":
     year = 2023
 
     # Load data
-    # data = load_data(tour, year, db_path, training=False, segment_data=True)
-    # print(data)
+    data = load_data(tour, year, db_path, training=False, segment_data=True)
+    print(data)
     rider = get_rider(18340568, tour, year, db_path, training=True, segment_data=True)
-    print(rider.model_dump())
+    # print(rider.model_dump())

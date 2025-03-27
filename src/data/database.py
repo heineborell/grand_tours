@@ -93,7 +93,7 @@ GROUP BY tour_year;
     return date_list
 
 
-def get_rider(athlete_id, tour, year, db_path, training=True):
+def get_rider(athlete_id, tour, year, db_path, training=True, segment_data=False):
     """Create Pydantic Rider object given athlete_id, tour, year, db_path."""
 
     # Load database path config
@@ -128,11 +128,14 @@ def get_rider(athlete_id, tour, year, db_path, training=True):
             # Execute with a tuple for values
             ride_rows = cursor.execute(rides_query, (athlete_id, tour + str(-year))).fetchall()
 
-    # [print(json.loads(row[5]).get("segment_distance")) for row in ride_rows]
     race_day_list_full, race_day_list = get_race_day(grand_tours_db_path)
+    drop_list = []
+    if segment_data:
+        [check_segment(row, drop_list) for row in ride_rows]
 
     # Convert SQL rows to Pydantic models
-    rides = [create_ride(row, training, race_day_list_full, race_day_list) for row in ride_rows]
+    ride_rows = [row for row in ride_rows if row[0] not in drop_list]
+    rides = [create_ride(row, training, race_day_list_full, race_day_list, segment_data) for row in ride_rows]
     rider = Rider(strava_id=athlete_id, name=rider_name, rides=rides)
 
     return rider
@@ -145,7 +148,14 @@ def get_race_day(grand_tours_db_path):
     return race_day_list_full, race_day_list
 
 
-def create_ride(row, training, race_day_list_full, race_day_list):
+def check_segment(row, drop_list):
+    try:
+        ([Segment(name=segments) for segments in json.loads(row[7]).get("segment_name")],)
+    except TypeError:
+        drop_list.append(row[0])
+
+
+def create_ride(row, training, race_day_list_full, race_day_list, segment_data):
     ride_data = json.loads(row[4 if training else -1])
     return Ride(
         activity_id=row[0],
@@ -156,6 +166,6 @@ def create_ride(row, training, race_day_list_full, race_day_list):
         tour_year=row[2],
         ride_date=mdy_to_ymd(row[3 if training else 5]),
         race_start_day=race_day_list_full[race_day_list.index(row[2].split("_")[0] + row[2][12:])][0],
-        segments={"bum": Segment(dist=12)},
         **({"stage": row[6].strip()} if not training else {}),
+        segments=[Segment(name="dfsdafa")] if segment_data else [],
     )

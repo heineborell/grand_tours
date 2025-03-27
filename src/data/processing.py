@@ -10,13 +10,14 @@ from data.database import get_rider
 
 
 def fetch_riders(db_path, tour, year):
+    """Given tour, year and database path it returns a list of strava_ids"""
     # Load config
     with open(db_path, "r") as f:
         db_path = json.loads(f.read())
 
+    # selects the grand_tours database path from path json file
     grand_tours_db_path = os.path.expanduser(db_path["global"]["grand_tours_db_path"])
 
-    """Enter tour and year e.g. 2024, tdf to get the list of rider_ids"""
     conn = sqlite3.connect(grand_tours_db_path)
     query = f"SELECT DISTINCT(athlete_id) FROM strava_table WHERE tour_year='{tour}-{year}'"
     riders = conn.execute(query).fetchall()
@@ -45,11 +46,13 @@ def create_dataframe(rider_ids, tour, year, db_path, training=True):
 
 
 def clean_dataframe(data):
+    """Choose the rides with distance and elevation greater than zero."""
     data = data[(data["distance"] > 0) & (data["elevation"] > 0)].dropna(subset=["time"])
     return data
 
 
 def create_features(data, training):
+    """Create new features for the database."""
     # Feature Engineering
     data["time_delta"] = (data["race_start_day"] - data["ride_day"]).apply(lambda x: x.days)
     if training:

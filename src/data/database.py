@@ -4,7 +4,7 @@ import sqlite3
 from datetime import datetime
 from typing import Optional
 
-from data.schemas import Ride, Rider
+from data.schemas import Ride, Rider, Segment
 
 
 def hms_to_seconds(hms: dict[int, str]) -> Optional[int]:
@@ -53,6 +53,8 @@ def mdy_to_ymd(d):
 
 
 def get_first_day_race(database_path):
+    """Returns the first day of the races."""
+
     # Fetch the race dates
     with sqlite3.connect(database_path) as conn:
         cursor = conn.cursor()
@@ -92,16 +94,19 @@ GROUP BY tour_year;
 
 
 def get_rider(athlete_id, tour, year, db_path, training=True):
-    # Load config
+    """Create Pydantic Rider object given athlete_id, tour, year, db_path."""
+
+    # Load database path config
     with open(db_path, "r") as f:
         db_path = json.loads(f.read())
 
+    # set paths for both of databases grand_tours and training
     grand_tours_db_path = os.path.expanduser(db_path["global"]["grand_tours_db_path"])
     training_db_path = os.path.expanduser(db_path["global"]["training_db_path"])
-    # Fetch rider name
+
+    # Fetch rider name given athlete_id from sql query
     with sqlite3.connect(grand_tours_db_path) as conn:
         cursor = conn.cursor()
-        # Fetch rider name
         cursor.execute("SELECT name FROM strava_names WHERE athlete_id = ?", (athlete_id,))
         rider_row = cursor.fetchone()
         if not rider_row:
@@ -109,10 +114,11 @@ def get_rider(athlete_id, tour, year, db_path, training=True):
 
         rider_name = rider_row[0]
 
+    # get the first day for all races
     race_day_list_full = get_first_day_race(grand_tours_db_path)
     race_day_list = [i[1] for i in race_day_list_full]
 
-    # Fetch rides
+    # Fetch rides, if its training fetch it from training db if its race fetch it from grand_tours
     if training:
         with sqlite3.connect(training_db_path) as conn:
             cursor = conn.cursor()
@@ -126,37 +132,24 @@ def get_rider(athlete_id, tour, year, db_path, training=True):
             # Execute with a tuple for values
             ride_rows = cursor.execute(rides_query, (athlete_id, tour + str(-year))).fetchall()
 
+    # [print(json.loads(row[5]).get("segment_distance")) for row in ride_rows]
     # # Convert SQL rows to Pydantic models
-    if training:
-        rides = [
-            Ride(
-                activity_id=row[0],
-                distance=json.loads(row[4])["dist"].split(" ")[0],
-                time=hms_to_seconds(json.loads(row[4])),
-                elevation=get_elevation(json.loads(row[4])),
-                avg_power=safe_get_wap(json.loads(row[4])),
-                tour_year=row[2],
-                ride_date=mdy_to_ymd(row[3]),
-                race_start_day=race_day_list_full[race_day_list.index(row[2].split("_")[0] + row[2][12:])][0],
-            )
-            for row in ride_rows
-        ]
-        rider = Rider(strava_id=athlete_id, name=rider_name, rides=rides)
-    else:
-        rides = [
-            Ride(
-                activity_id=row[0],
-                distance=json.loads(row[-1])["dist"].split(" ")[0],
-                time=hms_to_seconds(json.loads(row[-1])),
-                elevation=get_elevation(json.loads(row[-1])),
-                avg_power=safe_get_wap(json.loads(row[-1])),
-                stage=row[6].strip(" "),
-                tour_year=row[2],
-                ride_date=mdy_to_ymd(row[5]),
-                race_start_day=race_day_list_full[race_day_list.index(row[2].split("_")[0] + row[2][12:])][0],
-            )
-            for row in ride_rows
-        ]
-        rider = Rider(strava_id=athlete_id, name=rider_name, rides=rides)
+    def create_ride(row, training):
+        ride_data = json.loads(row[4 if training else -1])
+        return Ride(
+            activity_id=row[0],
+            distance=ride_data["dist"].split(" ")[0],
+            time=hms_to_seconds(ride_data),
+            elevation=get_elevation(ride_data),
+            avg_power=safe_get_wap(ride_data),
+            tour_year=row[2],
+            ride_date=mdy_to_ymd(row[3 if training else 5]),
+            race_start_day=race_day_list_full[race_day_list.index(row[2].split("_")[0] + row[2][12:])][0],
+            segments={"bum": Segment(dist=12)},
+            **({"stage": row[6].strip()} if not training else {}),
+        )
+
+    rides = [create_ride(row, training) for row in ride_rows]
+    rider = Rider(strava_id=athlete_id, name=rider_name, rides=rides)
 
     return rider

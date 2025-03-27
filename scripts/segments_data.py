@@ -14,4 +14,5 @@ if __name__ == "__main__":
     # Load data
     # data = load_data(tour, year, db_path, training=False, segment_data=True)
     # print(data)
-    print(get_rider(18340568, tour, year, db_path, training=True, segment_data=True))
+    rider = get_rider(18340568, tour, year, db_path, training=True, segment_data=True)
+    print(rider.model_dump())

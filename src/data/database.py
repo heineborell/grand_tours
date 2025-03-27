@@ -2,15 +2,13 @@ import json
 import os
 import sqlite3
 from datetime import datetime
-from typing import Optional
 
 from data.schemas import Ride, Rider, Segment
 
 
-def hms_to_seconds(hms: dict[int, str]) -> Optional[int]:
+def hms_to_seconds(hms_value):
     """Takes the time in formats H:M:S, M:S, S to seconds"""
     try:
-        hms_value = hms["move_time"]  # Ensure this is a valid key
         if isinstance(hms_value, str):  # Check if it's a string
             if hms_value.endswith("s"):  # Only seconds format (e.g., "2s")
                 return int(hms_value[:-1])  # Convert "2s" -> 2
@@ -158,15 +156,15 @@ def check_segment(row, drop_list, training):
 def create_ride(row, training, race_day_list_full, race_day_list, segment_data):
     ride_data = json.loads(row[4 if training else -1])
     segment_name_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_name")]
-    # segment_time_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_time")]
+    segment_time_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_time")]
     segments = []
     if segment_data:
-        for seg in segment_name_list:
-            segments.append(Segment(name=seg))
+        for seg_name, seg_time in zip(segment_name_list, segment_time_list):
+            segments.append(Segment(name=seg_name, time=hms_to_seconds(seg_time)))
     return Ride(
         activity_id=row[0],
         distance=ride_data["dist"].split(" ")[0],
-        time=hms_to_seconds(ride_data),
+        time=hms_to_seconds(ride_data["move_time"]),
         elevation=get_elevation(ride_data),
         avg_power=safe_get_wap(ride_data),
         tour_year=row[2],

@@ -1,7 +1,11 @@
 from datetime import date
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
+
+
+class Segment(BaseModel):
+    dist: int
 
 
 class Ride(BaseModel):
@@ -14,6 +18,7 @@ class Ride(BaseModel):
     stage: Optional[str] = Field(None, description="Race stage.")
     ride_date: date = Field(..., description="Date of the activity.")
     race_start_day: date = Field(..., description="First day of the race that is considered.")
+    segments: Dict[str, Segment]
 
 
 class Rider(BaseModel):
@@ -36,6 +41,7 @@ class Rider(BaseModel):
                     "tour_year": ride.tour_year,
                     "ride_day": ride.ride_date,
                     "race_start_day": ride.race_start_day,
+                    "segments": ride.segments,
                 }
                 for ride in self.rides
             ]

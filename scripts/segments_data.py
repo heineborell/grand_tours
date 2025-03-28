@@ -13,7 +13,7 @@ if __name__ == "__main__":
     year = 2023
 
     # Load data
-    data = load_data(tour, year, db_path, training=False, segment_data=True)
+    data = load_data(tour, year, db_path, training=False, segment_data=False)
     print(data)
-    rider = get_rider(18340568, tour, year, db_path, training=True, segment_data=True)
+    rider = get_rider(18340568, tour, year, db_path, training=True, segment_data=False)
     # print(rider.model_dump())

@@ -3,6 +3,8 @@ import os
 import sqlite3
 from datetime import datetime
 
+from rich import print as print
+
 from data.schemas import Ride, Rider, Segment
 
 
@@ -139,7 +141,11 @@ def get_rider(athlete_id, tour, year, db_path, training=True, segment_data=False
 
     # Convert SQL rows to Pydantic models
     ride_rows = [row for row in ride_rows if row[0] not in drop_list]
-    rides = [create_ride(row, training, race_day_list_full, race_day_list, segment_data) for row in ride_rows]
+    rides = [
+        ride
+        for row in ride_rows
+        if (ride := create_ride(row, training, race_day_list_full, race_day_list, segment_data)) is not None
+    ]
     rider = Rider(strava_id=athlete_id, name=rider_name, rides=rides)
 
     return rider
@@ -161,13 +167,13 @@ def check_segment(row, drop_list, training):
 
 def create_ride(row, training, race_day_list_full, race_day_list, segment_data):
     ride_data = json.loads(row[4 if training else -1])
-    segment_name_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_name")]
-    segment_dist_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_distance")]
-    segment_time_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_time")]
-    segment_vert_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_vert")]
-    segment_grade_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_grade")]
-    segments = []
     if segment_data:
+        segment_name_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_name")]
+        segment_dist_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_distance")]
+        segment_time_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_time")]
+        segment_vert_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_vert")]
+        segment_grade_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_grade")]
+        segments = []
         for seg_name, seg_dist, seg_time, seg_vert, seg_grade in zip(
             segment_name_list, segment_dist_list, segment_time_list, segment_vert_list, segment_grade_list
         ):
@@ -180,15 +186,29 @@ def create_ride(row, training, race_day_list_full, race_day_list, segment_data):
                     grade=float(seg_grade[:-1]),
                 )
             )
+    else:
+        segments = []
+
+    try:
+        time = hms_to_seconds(ride_data["move_time"])
+        distance = float(ride_data["dist"].split(" ")[0])
+        elevation = get_elevation(ride_data)
+        avg_power = safe_get_wap(ride_data)
+        ride_date = mdy_to_ymd(row[3 if training else 5])
+        race_start_day = race_day_list_full[race_day_list.index(row[2].split("_")[0] + row[2][12:])][0]
+    except (KeyError, ValueError):
+        print(f"Activity {row[0]} is missing important entry")
+        return None
+
     return Ride(
         activity_id=row[0],
-        distance=ride_data["dist"].split(" ")[0],
-        time=hms_to_seconds(ride_data["move_time"]),
-        elevation=get_elevation(ride_data),
-        avg_power=safe_get_wap(ride_data),
+        distance=distance,
+        time=time,
+        elevation=elevation,
+        avg_power=avg_power,
         tour_year=row[2],
-        ride_date=mdy_to_ymd(row[3 if training else 5]),
-        race_start_day=race_day_list_full[race_day_list.index(row[2].split("_")[0] + row[2][12:])][0],
+        ride_date=ride_date,
+        race_start_day=race_start_day,
         **({"stage": row[6].strip()} if not training else {}),
         segments=segments,
     )

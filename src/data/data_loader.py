@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 from data.processing import clean_dataframe, create_dataframe, create_features, fetch_riders
 
@@ -36,6 +37,7 @@ def get_data_info(data):
 
 
 def config_loader(tour, year, config_path):
+    config_path = Path(config_path).resolve()
     with open(config_path, "r") as f:
         config = json.loads(f.read())
 
@@ -49,4 +51,4 @@ def config_loader(tour, year, config_path):
     ) as f:
         f.write(json_data)
 
-    return config_path
+    return str(config_path)

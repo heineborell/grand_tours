@@ -191,13 +191,42 @@ def create_ride(row, training, race_day_list_full, race_day_list, segment_data):
 
     try:
         time = hms_to_seconds(ride_data["move_time"])
+    except (KeyError, ValueError) as e:
+        print(f"Error in move_time: {e}")
+        return None
+
+    try:
         distance = float(ride_data["dist"].split(" ")[0])
+    except (KeyError, ValueError) as e:
+        print(f"Error in distance: {e}")
+        return None
+
+    try:
         elevation = get_elevation(ride_data)
+    except (KeyError, ValueError) as e:
+        print(f"Error in elevation: {e}")
+        return None
+
+    try:
         avg_power = safe_get_wap(ride_data)
+    except (KeyError, ValueError) as e:
+        print(f"Error in avg_power: {e}")
+        return None
+
+    try:
         ride_date = mdy_to_ymd(row[3 if training else 5])
-        race_start_day = race_day_list_full[race_day_list.index(row[2].split("_")[0] + row[2][12:])][0]
-    except (KeyError, ValueError):
-        print(f"Activity {row[0]} is missing important entry")
+    except (KeyError, ValueError) as e:
+        print(f"Error in ride_date: {e}")
+        return None
+
+    try:
+        if training:
+            race_start_day = race_day_list_full[race_day_list.index(row[2].split("_")[0] + "-" + row[2][-4:])][0]
+        else:
+            race_start_day = race_day_list_full[race_day_list.index(row[2])][0]
+
+    except (KeyError, ValueError, IndexError) as e:
+        print(f"Error in race_start_day: {e}")
         return None
 
     return Ride(

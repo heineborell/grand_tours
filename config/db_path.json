@@ -1,4 +1,4 @@
 {"global": {
-        "grand_tours_db_path": "~/iCloud/Research/Data_Science/Projects/data/grand_tours.db",
-        "training_db_path": "~/iCloud/Research/Data_Science/Projects/data/training_merged.db"
+        "grand_tours_db_path": "~/Erdos/grand-tours-resources/data/grand_tours.db",
+        "training_db_path": "~/Erdos/grand-tours-resources/data/training_merged.db"
     }}

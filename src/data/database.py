@@ -177,13 +177,33 @@ def create_ride(row, training, race_day_list_full, race_day_list, segment_data):
         for seg_name, seg_dist, seg_time, seg_vert, seg_grade in zip(
             segment_name_list, segment_dist_list, segment_time_list, segment_vert_list, segment_grade_list
         ):
+            try:
+                dist = remove_km(seg_dist)
+            except (KeyError, ValueError) as e:
+                print(f"Error in segment_dist: {e}")
+                continue
+            try:
+                time = hms_to_seconds(seg_time)
+            except (KeyError, ValueError) as e:
+                print(f"Error in segment_time: {e}")
+                continue
+            try:
+                vert = int(seg_vert[:-1].replace(",", ""))
+            except (KeyError, ValueError) as e:
+                print(f"Error in segment_vert: {e}")
+                continue
+            try:
+                grade = float(seg_grade[:-1])
+            except (KeyError, ValueError) as e:
+                print(f"Error in segment_grade: {e}")
+                continue
             segments.append(
                 Segment(
                     name=seg_name,
-                    dist=remove_km(seg_dist),
-                    time=hms_to_seconds(seg_time),
-                    vert=int(seg_vert[:-1].replace(",", "")),
-                    grade=float(seg_grade[:-1]),
+                    dist=dist,
+                    time=time,
+                    vert=vert,
+                    grade=grade,
                 )
             )
     else:

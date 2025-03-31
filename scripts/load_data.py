@@ -7,8 +7,8 @@ from data.processing import fetch_riders
 
 if __name__ == "__main__":
     db_path = Path("config/db_path.json")
-    tour = "giro"
-    year = 2022
+    tour = "tdf"
+    year = 2024
 
     config_path = Path(config_loader(tour, year, "config/config.json"))
 

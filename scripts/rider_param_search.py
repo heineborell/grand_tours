@@ -8,16 +8,23 @@ from data.processing import fetch_riders
 from training.gridsearch import json_writer, param_search
 
 if __name__ == "__main__":
-    db_path = Path("config/db_path.json")
+    # Get the absolute path of the project root dynamically
+    PROJECT_ROOT = Path(__file__).resolve().parent.parent  # Adjust if needed
+    CONFIG_PATH = PROJECT_ROOT / "config/config.json"
+    DB_PATH = PROJECT_ROOT / "config/db_path.json"
+
+    # Enter tour, year of your choice
     tour = "tdf"
-    year = 2023
+    year = 2024
 
-    config_path = Path(config_loader(tour, year, "config/config.json"))
+    # Gets the configuration json file needed for training models, hyperparameters. Check /config/config.json file.
+    config_path = Path(config_loader(tour, year, config_path=CONFIG_PATH))
 
-    # # Load data
-    data = load_data(tour, year, db_path, training=True).dropna(subset=["avg_power"])
+    # Load data
+    data = load_data(tour, year, db_path=DB_PATH, training=True, segment_data=False)
+    print(data)
 
-    print(f"The total number of riders in the race dataset is {len(fetch_riders(db_path, tour, year))}.")
+    print(f"The total number of riders in the race dataset is {len(fetch_riders(DB_PATH, tour, year))}.")
 
     sorted_list = get_data_info(data)
 

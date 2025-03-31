@@ -1,7 +1,7 @@
 {
     "training": true,
     "tour": "tdf",
-    "year": 2021,
+    "year": 2023,
     "features": [
         "distance",
         "elevation",
@@ -15,7 +15,7 @@
         "random_forest_regressor": {
             "hyperparameters": {
                 "min_samples_leaf": 2,
-                "n_estimators": 300
+                "n_estimators": 600
             }
         },
         "xgboost": {

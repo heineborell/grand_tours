@@ -39,7 +39,8 @@ def get_elevation(row_json):
 
 def safe_get_wap(row_json):
     try:
-        return row_json["wap"].split(" ")[0]  # Extract value safely
+        if "," not in row_json["wap"]:  # some wap's have , seperating them and we filter them out here
+            return row_json["wap"].split(" ")[0]  # Extract value safely
     except (KeyError, AttributeError):
         return None  # Return None if key is missing
 

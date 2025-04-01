@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     # Enter tour, year of your choice
     tour = "tdf"
-    year = 2024
+    year = 2023
 
     # Gets the configuration json file needed for training models, hyperparameters. Check /config/config.json file.
     config_path = Path(config_loader(tour, year, config_path=CONFIG_PATH))

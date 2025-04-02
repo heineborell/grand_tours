@@ -11,7 +11,7 @@ from training.kfold import kfold_split_train
 if __name__ == "__main__":
     db_path = Path("config/db_path.json")
     tour = "tdf"
-    year = 2023
+    year = 2021
 
     config_path = Path(config_loader(tour, year, "config/config.json"))
 

@@ -10,7 +10,7 @@ from training.gridsearch import json_writer, param_search
 if __name__ == "__main__":
     # Get the absolute path of the project root dynamically
     PROJECT_ROOT = Path(__file__).resolve().parent.parent  # Adjust if needed
-    CONFIG_PATH = PROJECT_ROOT / "config/config.json"
+    CONFIG_PATH = PROJECT_ROOT / "config/config_power.json"
     DB_PATH = PROJECT_ROOT / "config/db_path.json"
 
     # Enter tour, year of your choice
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     config_path = Path(config_loader(tour, year, config_path=CONFIG_PATH))
 
     # Load data
-    data = load_data(tour, year, db_path=DB_PATH, training=True, segment_data=False)
+    data = load_data(tour, year, db_path=DB_PATH, training=True, segment_data=False).dropna(subset=["avg_power"])
     print(data)
 
     print(f"The total number of riders in the race dataset is {len(fetch_riders(DB_PATH, tour, year))}.")

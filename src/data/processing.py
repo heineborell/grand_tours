@@ -55,6 +55,7 @@ def create_features(data, training):
     """Create new features for the database."""
     # Feature Engineering
     data["time_delta"] = (data["race_start_day"] - data["ride_day"]).apply(lambda x: x.days)
+    data["VAM"] = (data["elevation"] * 3600 / data["time"]).round().astype(int)
     if training:
         data = data.drop(index=data.loc[data["ride_day"] > data["race_start_day"]].index)
     return data

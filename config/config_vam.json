@@ -5,7 +5,8 @@
     "features": [
         "distance",
         "elevation",
-        "time_delta"
+        "time_delta",
+        "VAM"
     ],
     "target": "time",
     "models": {

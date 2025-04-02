@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     # Enter tour, year of your choice
     tour = "tdf"
-    years = [2022, 2023, 2024]
+    years = [2021, 2022, 2023, 2024]
     data_list = []
 
     for year in years:

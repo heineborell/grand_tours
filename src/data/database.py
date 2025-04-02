@@ -1,6 +1,7 @@
 import json
 import os
 import sqlite3
+import sys
 from datetime import datetime
 
 from rich import print as print
@@ -181,22 +182,30 @@ def create_ride(row, training, race_day_list_full, race_day_list, segment_data):
             try:
                 dist = remove_km(seg_dist)
             except (KeyError, ValueError) as e:
-                print(f"Error in segment_dist: {e}")
+                sys.stdout.write(f"Error in segment_dist: {e}\n")
+                sys.stdout.flush()
+                sys.stdout.write("\033[F\033[K")
                 continue
             try:
                 time = hms_to_seconds(seg_time)
             except (KeyError, ValueError) as e:
-                print(f"Error in segment_time: {e}")
+                sys.stdout.write(f"Error in segment_time: {e}\n")
+                sys.stdout.flush()
+                sys.stdout.write("\033[F\033[K")
                 continue
             try:
                 vert = int(seg_vert[:-1].replace(",", ""))
             except (KeyError, ValueError) as e:
-                print(f"Error in segment_vert: {e}")
+                sys.stdout.write(f"Error in segment_vert: {e}\n")
+                sys.stdout.flush()
+                sys.stdout.write("\033[F\033[K")
                 continue
             try:
                 grade = float(seg_grade[:-1])
             except (KeyError, ValueError) as e:
-                print(f"Error in segment_grade: {e}")
+                sys.stdout.write(f"Error in segment_grade: {e}\n")
+                sys.stdout.flush()
+                sys.stdout.write("\033[F\033[K")
                 continue
             segments.append(
                 Segment(
@@ -209,47 +218,51 @@ def create_ride(row, training, race_day_list_full, race_day_list, segment_data):
             )
     else:
         segments = []
-
     try:
         time = hms_to_seconds(ride_data["move_time"])
     except (KeyError, ValueError) as e:
-        print(f"Error in move_time: {e} in activity {row[0]}.")
+        sys.stdout.write(f"Error in move_time: {e} in activity {row[0]}.\n")
+        sys.stdout.flush()
+        sys.stdout.write("\033[F\033[K")
         return None
-
     try:
         distance = float(ride_data["dist"].split(" ")[0])
     except (KeyError, ValueError) as e:
-        print(f"Error in distance: {e} in activity {row[0]}.")
+        sys.stdout.write(f"Error in distance: {e} in activity {row[0]}.\n")
+        sys.stdout.flush()
+        sys.stdout.write("\033[F\033[K")
         return None
-
     try:
         elevation = get_elevation(ride_data)
     except (KeyError, ValueError) as e:
-        print(f"Error in elevation: {e} in activity {row[0]}.")
+        sys.stdout.write(f"Error in elevation: {e} in activity {row[0]}.\n")
+        sys.stdout.flush()
+        sys.stdout.write("\033[F\033[K")
         return None
-
     try:
         avg_power = safe_get_wap(ride_data)
     except (KeyError, ValueError) as e:
-        print(f"Error in avg_power: {e} in activity {row[0]}.")
+        sys.stdout.write(f"Error in avg_power: {e} in activity {row[0]}.\n")
+        sys.stdout.flush()
+        sys.stdout.write("\033[F\033[K")
         return None
-
     try:
         ride_date = mdy_to_ymd(row[3 if training else 5])
     except (KeyError, ValueError) as e:
-        print(f"Error in ride_date: {e} in activity {row[0]}.")
+        sys.stdout.write(f"Error in ride_date: {e} in activity {row[0]}.\n")
+        sys.stdout.flush()
+        sys.stdout.write("\033[F\033[K")
         return None
-
     try:
         if training:
             race_start_day = race_day_list_full[race_day_list.index(row[2].split("_")[0] + "-" + row[2][-4:])][0]
         else:
             race_start_day = race_day_list_full[race_day_list.index(row[2])][0]
-
     except (KeyError, ValueError, IndexError) as e:
-        print(f"Error in race_start_day: {e}")
+        sys.stdout.write(f"Error in race_start_day: {e}\n")
+        sys.stdout.flush()
+        sys.stdout.write("\033[F\033[K")
         return None
-
     return Ride(
         activity_id=row[0],
         distance=distance,

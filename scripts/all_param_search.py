@@ -10,12 +10,12 @@ from training.gridsearch import json_writer, param_search
 if __name__ == "__main__":
     # Get the absolute path of the project root dynamically
     PROJECT_ROOT = Path(__file__).resolve().parent.parent  # Adjust if needed
-    CONFIG_PATH = PROJECT_ROOT / "config/config_power.json"
+    CONFIG_PATH = PROJECT_ROOT / "config/config_vampower.json"
     DB_PATH = PROJECT_ROOT / "config/db_path.json"
 
     # Enter tour, year of your choice
     tour = "tdf"
-    year = 2024
+    year = 2022
 
     # Gets the configuration json file needed for training models, hyperparameters. Check /config/config.json file.
     config_path = Path(config_loader(tour, year, config_path=CONFIG_PATH))

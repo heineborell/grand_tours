@@ -11,7 +11,7 @@ from training.kfold import kfold_split_train
 if __name__ == "__main__":
     db_path = Path("config/db_path.json")
     tour = "tdf"
-    year = 2024
+    year = 2023
 
     config_path = Path(config_loader(tour, year, "config/config.json"))
 
@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     print(f"The total number of riders in the race dataset is {len(fetch_riders(db_path, tour, year))}.")
 
-    config_train = Path(f"config/config_{tour}_training-{year}_all_power.json")
+    config_train = Path(f"config/config_{tour}_training-{year}_all.json")
     with open(config_train, "r") as f:
         config = json.loads(f.read())
 

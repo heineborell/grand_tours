@@ -1,11 +1,13 @@
 {
     "training": true,
     "tour": "tdf",
-    "year": 2023,
+    "year": 2022,
     "features": [
         "distance",
         "elevation",
-        "time_delta"
+        "time_delta",
+        "VAM",
+        "avg_power"
     ],
     "target": "time",
     "models": {

@@ -1,10 +1,13 @@
+# src/preprocessing/gt_column_deletion.py
+from pathlib import Path
+import sqlite3
+
 '''
 Let column to be deleted = chosen_column
 1. Create a temporary table with all columns except the chosen_column.
 2. Copy all data except the chosen_column into the temporary table.
 3. Replace the original table with the temporary table.
 '''
-import sqlite3
 
 db_path = 'data/strava_segments.db'
 table_name = 'segment_activity'

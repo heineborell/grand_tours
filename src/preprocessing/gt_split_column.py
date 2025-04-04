@@ -1,3 +1,5 @@
+# src/preprocessing/gt_split_column.py
+from pathlib import Path
 import sqlite3
 import pandas as pd
 import re

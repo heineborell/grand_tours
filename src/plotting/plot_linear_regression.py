@@ -1,5 +1,5 @@
 #src/plotting/plot_linear_regression.py
-
+from pathlib import Path
 import numpy as np
 import seaborn as sns
 ##
@@ -38,13 +38,16 @@ def summarize_and_plot_linear_regression(table_name, fit_params, lin_reg_params)
     itt_txt = "ITT_T" if fit_params['Include ITT'] else "ITT_F"
     norm_txt = "N_T" if fit_params['Normalize']  else "N_F"
     
+    print("\n")
+    print(f"\nlen of X_train = {len(X_train)}")
+    print(f"\nlen of itt_indices = {len(itt_indices)}")
     #-------------------
     fig, ax = plt.subplots(figsize=(10, 6.5))
     # plot data
     ax.scatter(X_train, y_train, color=tour_color, edgecolors='k', s=15, label=f"{tour_name} Data")
     if len(itt_indices) > 0:
         print(f"\nlen itt_indices = {len(itt_indices)}")
-        ax.plot(X_train.iloc[itt_indices], y_train.iloc[itt_indices], marker='o',  mfc='b', mec='k', ms=4, ls='None', label=f"{tour_name} ITT Data")
+        ax.plot(X_train[itt_indices], y_train[itt_indices], marker='o',  mfc='b', mec='k', ms=4, ls='None', label=f"{tour_name} ITT Data")
     # plot prediction-equation
     y_lin_pred = model.predict(X_train)
     ax.plot(X_train, y_lin_pred, color='b', lw=1.5, label='Regression Line')

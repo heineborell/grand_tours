@@ -1,5 +1,5 @@
 # src/config.py
-
+from pathlib import Path
 import numpy as np
 
 PLOT_PATHS = {

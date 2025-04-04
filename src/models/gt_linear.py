@@ -1,5 +1,5 @@
 #src/models/gt_linear.py
-
+from pathlib import Path
 import numpy as np
 ##
 from sklearn.model_selection import train_test_split

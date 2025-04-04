@@ -1,3 +1,9 @@
+# src/preprocessing/strava_parse_segments.py
+from pathlib import Path
+import sqlite3
+import pandas as pd
+import json
+import re
 '''
 1. Connects to the SQLite database and reads the segments_data table.
 2. Parses the BLOB data in the segment column to extract the required fields.
@@ -5,10 +11,7 @@
 4. Extracts and formats data according to the unit handling rules specified.
 5. Inserts the parsed data into the new table.
 '''
-import sqlite3
-import pandas as pd
-import json
-import re
+
 
 # Paths for old and new databases
 old_db_path = "data/training.db"  

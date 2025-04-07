@@ -99,3 +99,5 @@ AND t3.strava_distance < (t1.distance * 0.2 + t1.distance);
 
 ```
 ### Training datasets
+
+## Training Methods

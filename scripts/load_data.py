@@ -20,6 +20,6 @@ if __name__ == "__main__":
 
     # Load data
     data = load_data(tour, year, db_path=DB_PATH, training=True, segment_data=True)
-    print(data["segments"])
+    print(data)
 
     print(f"The total number of riders in the race dataset is {len(fetch_riders(DB_PATH, tour, year))}.")

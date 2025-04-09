@@ -1,6 +1,6 @@
 {
     "training": true,
-    "tour": "giro",
+    "tour": "tdf",
     "year": 2023,
     "features": [
         "distance",

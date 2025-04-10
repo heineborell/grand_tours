@@ -15,20 +15,19 @@ if __name__ == "__main__":
 
     # Enter tour, year of your choice
     tour = "tdf"
-    year = 2023
+    year = 2022
 
     # Gets the configuration json file needed for training models, hyperparameters. Check /config/config.json file.
     config_path = Path(config_loader(tour, year, config_path=CONFIG_PATH))
 
     # Load data
-    data = load_data(tour, year, db_path=DB_PATH, training=True, segment_data=False)
-    print(data)
+    data = load_data(tour, year, db_path=DB_PATH, training=True, segment_data=True)
 
     print(f"The total number of riders in the race dataset is {len(fetch_riders(DB_PATH, tour, year))}.")
 
     sorted_list = get_data_info(data)
 
-    for rider in list(sorted_list["strava_id"])[-20:-1]:
+    for rider in list(sorted_list["strava_id"])[-3:-1]:
         rider_data = data.loc[data["strava_id"] == rider]
 
         # Splitting train and test

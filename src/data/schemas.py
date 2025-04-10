@@ -1,6 +1,7 @@
 from datetime import date
 from typing import List, Optional
 
+import pandas as pd
 from pydantic import BaseModel, Field
 
 
@@ -31,8 +32,6 @@ class Rider(BaseModel):
     rides: List[Ride]
 
     def to_dataframe(self):
-        import pandas as pd
-
         return pd.DataFrame(
             [
                 {
@@ -51,3 +50,25 @@ class Rider(BaseModel):
                 for ride in self.rides
             ]
         )
+
+    def to_segment_df(self):
+        rows = []
+        for activity in self.rides:
+            for segment in activity.segments:
+                rows.append(
+                    {
+                        "activity_id": activity.activity_id,
+                        "strava_id": self.strava_id,
+                        "rider_name": self.name,
+                        "tour_year": activity.tour_year,
+                        "stage": activity.stage,
+                        "ride_day": activity.ride_date,
+                        "race_start_day": activity.race_start_day,
+                        "name": segment.name,
+                        "distance": segment.dist,
+                        "time": segment.time,
+                        "vertical": segment.vert,
+                        "grade": segment.grade,
+                    }
+                )
+        return pd.DataFrame(rows)

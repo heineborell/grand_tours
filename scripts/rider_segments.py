@@ -22,5 +22,7 @@ if __name__ == "__main__":
     # Get rider list
     rider_list = fetch_riders(DB_PATH, tour, year)
 
-    for rider in list(rider_list)[-3:-1]:
-        print(get_rider(rider, tour, year, DB_PATH, training=True, segment_data=True).to_segment_df())
+    for id in list(rider_list):
+        rider = get_rider(id, tour, year, DB_PATH, training=True, segment_data=True)
+        if rider:  # Ensure rider is not None
+            print(rider.to_segment_df())

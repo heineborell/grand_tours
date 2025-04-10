@@ -11,6 +11,8 @@ class Segment(BaseModel):
     time: Optional[int] = None
     vert: Optional[int] = None
     grade: Optional[float] = None
+    watt: Optional[int] = None
+    heart_rate: Optional[int] = None
 
 
 class Ride(BaseModel):
@@ -69,6 +71,9 @@ class Rider(BaseModel):
                         "time": segment.time,
                         "vertical": segment.vert,
                         "grade": segment.grade,
+                        "watt": segment.watt,
+                        "heart_rate": segment.heart_rate,
                     }
                 )
-        return pd.DataFrame(rows)
+        df = pd.DataFrame(rows)
+        return df if not df.empty else None

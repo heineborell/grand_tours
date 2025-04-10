@@ -175,9 +175,17 @@ def create_ride(row, training, race_day_list_full, race_day_list, segment_data):
         segment_time_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_time")]
         segment_vert_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_vert")]
         segment_grade_list = [segments for segments in json.loads(row[5 if training else 7]).get("segment_grade")]
+        segment_watt_list = [segments for segments in json.loads(row[5 if training else 7]).get("watt")]
+        segment_hr_list = [segments for segments in json.loads(row[5 if training else 7]).get("heart_rate")]
         segments = []
-        for seg_name, seg_dist, seg_time, seg_vert, seg_grade in zip(
-            segment_name_list, segment_dist_list, segment_time_list, segment_vert_list, segment_grade_list
+        for seg_name, seg_dist, seg_time, seg_vert, seg_grade, seg_watt, seg_hr in zip(
+            segment_name_list,
+            segment_dist_list,
+            segment_time_list,
+            segment_vert_list,
+            segment_grade_list,
+            segment_watt_list,
+            segment_hr_list,
         ):
             try:
                 dist = remove_km(seg_dist)
@@ -207,6 +215,20 @@ def create_ride(row, training, race_day_list_full, race_day_list, segment_data):
                 sys.stdout.flush()
                 sys.stdout.write("\033[F\033[K")
                 continue
+            try:
+                watt = int(seg_watt[:-1])
+            except (KeyError, ValueError) as e:
+                sys.stdout.write(f"Error in segment_watt: {e}\n")
+                sys.stdout.flush()
+                sys.stdout.write("\033[F\033[K")
+                continue
+            try:
+                heart_rate = int(seg_hr[:-3])
+            except (KeyError, ValueError) as e:
+                sys.stdout.write(f"Error in segment_hr: {e}\n")
+                sys.stdout.flush()
+                sys.stdout.write("\033[F\033[K")
+                continue
             segments.append(
                 Segment(
                     name=seg_name,
@@ -214,6 +236,8 @@ def create_ride(row, training, race_day_list_full, race_day_list, segment_data):
                     time=time,
                     vert=vert,
                     grade=grade,
+                    watt=watt,
+                    heart_rate=heart_rate,
                 )
             )
     else:

@@ -13,8 +13,8 @@ if __name__ == "__main__":
     DB_PATH = PROJECT_ROOT / "config/db_path.json"
 
     # Enter tour, year of your choice
-    tour = "tdf"
-    year = 2022
+    tour = "giro"
+    year = 2023
 
     # Gets the configuration json file needed for training models, hyperparameters. Check /config/config.json file.
     config_path = Path(config_loader(tour, year, config_path=CONFIG_PATH))

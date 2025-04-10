@@ -1,8 +1,9 @@
 from pathlib import Path
 
-from rich import print as print
+from rich import print
 
-from data.data_loader import config_loader, load_data
+from data.data_loader import config_loader
+from data.database import get_rider
 from data.processing import fetch_riders
 
 if __name__ == "__main__":
@@ -13,13 +14,13 @@ if __name__ == "__main__":
 
     # Enter tour, year of your choice
     tour = "tdf"
-    year = 2024
+    year = 2022
 
     # Gets the configuration json file needed for training models, hyperparameters. Check /config/config.json file.
     config_path = Path(config_loader(tour, year, config_path=CONFIG_PATH))
 
-    # Load data
-    data = load_data(tour, year, db_path=DB_PATH, training=True, segment_data=True)
-    print(data["segments"])
+    # Get rider list
+    rider_list = fetch_riders(DB_PATH, tour, year)
 
-    print(f"The total number of riders in the race dataset is {len(fetch_riders(DB_PATH, tour, year))}.")
+    for rider in list(rider_list)[-3:-1]:
+        print(get_rider(rider, tour, year, DB_PATH, training=True, segment_data=True).to_segment_df())

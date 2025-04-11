@@ -221,13 +221,18 @@ def create_ride(row, training, race_day_list_full, race_day_list, segment_data):
                 sys.stdout.write(f"Error in segment_watt: {e}\n")
                 sys.stdout.flush()
                 sys.stdout.write("\033[F\033[K")
+                watt = None
                 continue
             try:
-                heart_rate = int(seg_hr[:-3])
-            except (KeyError, ValueError) as e:
+                if seg_hr != "—":
+                    heart_rate = int(seg_hr[:-3])
+                else:
+                    heart_rate = None
+            except ValueError as e:
                 sys.stdout.write(f"Error in segment_hr: {e}\n")
                 sys.stdout.flush()
                 sys.stdout.write("\033[F\033[K")
+                heart_rate = None
                 continue
             segments.append(
                 Segment(

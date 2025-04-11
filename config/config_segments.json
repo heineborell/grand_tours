@@ -1,0 +1,71 @@
+{
+    "training": true,
+    "tour": "tdf",
+    "year": 2024,
+    "features": [
+        "distance",
+        "vertical",
+        "grade"
+    ],
+    "target": "time",
+    "models": {
+        "linear_regression": {
+            "hyperparameters": null,
+            "param_grid": null
+        },
+        "random_forest_regressor": {
+            "hyperparameters": {
+                "min_samples_leaf": 2,
+                "n_estimators": 400
+            },
+            "param_grid": {
+                "min_samples_leaf": [
+                    2,
+                    3,
+                    5
+                ],
+                "n_estimators": [
+                    300,
+                    400,
+                    600
+                ]
+            }
+        },
+        "xgboost": {
+            "hyperparameters": {
+                "learning_rate": 0.01,
+                "max_depth": 3,
+                "n_estimators": 500
+            },
+            "param_grid": {
+                "max_depth": [
+                    3,
+                    5,
+                    7
+                ],
+                "learning_rate": [
+                    0.1,
+                    0.01,
+                    0.001
+                ],
+                "n_estimators": [
+                    300,
+                    400,
+                    500
+                ]
+            }
+        },
+        "linearsvr": {
+            "hyperparameters": {
+                "gamma": 3
+            },
+            "param_grid": {
+                "gamma": [
+                    3,
+                    5,
+                    8
+                ]
+            }
+        }
+    }
+}

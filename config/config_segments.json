@@ -1,11 +1,14 @@
 {
     "training": true,
     "tour": "tdf",
-    "year": 2024,
+    "year": [
+        2024
+    ],
     "features": [
         "distance",
         "vertical",
-        "grade"
+        "grade",
+        "time_delta"
     ],
     "target": "time",
     "models": {

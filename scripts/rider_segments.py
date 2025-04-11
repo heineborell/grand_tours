@@ -3,10 +3,12 @@ from pathlib import Path
 
 from rich import print
 from sklearn.model_selection import KFold, train_test_split
+from xgboost import training
 
 from data.data_loader import config_loader
 from data.database import get_rider
-from data.processing import fetch_riders
+from data.processing import create_features, fetch_riders
+from training.gridsearch import json_writer, param_search
 from training.kfold import kfold_split_train
 
 if __name__ == "__main__":
@@ -15,30 +17,34 @@ if __name__ == "__main__":
     CONFIG_PATH = PROJECT_ROOT / "config/config_segments.json"
     DB_PATH = PROJECT_ROOT / "config/db_path.json"
 
-    # Enter tour, year of your choice
+    # Enter tour and set if it is training or race, here we merged all years together
     tour = "tdf"
-    year = 2024
+    training = True
+    years = [2024]
 
-    # Gets the configuration json file needed for training models, hyperparameters. Check /config/config.json file.
-    config_path = Path(config_loader(tour, year, config_path=CONFIG_PATH))
+    # Open base config and prepare it for parameter search by entering the tour and years you selected
+    config_path = Path(config_loader(tour, years, config_path=CONFIG_PATH))
 
     # Get rider list
-    rider_list = fetch_riders(DB_PATH, tour, year)
+    rider_list = fetch_riders(DB_PATH, tour, years[0])
+    print(rider_list)
 
     # for id in list(rider_list):
     #     rider = get_rider(id, tour, year, DB_PATH, training=True, segment_data=True)
     #     if rider:  # Ensure rider is not None
     #         if rider.to_segment_df() is not None:
     #             print(f"rider id:{id}", len(rider.to_segment_df()))
-    rider = get_rider(1905161, tour, year, DB_PATH, training=True, segment_data=True)
+    rider = get_rider(7310716, tour, years[0], DB_PATH, training=True, segment_data=True)
     data = rider.to_segment_df()
     print(data[["distance", "vertical", "grade", "time"]].isnull().sum())
+    create_features(data, training=True)
+    print(data)
 
     # # Splitting train and test
     X_train, X_test = train_test_split(data, test_size=0.2, random_state=42)
 
-    # params = param_search(X_train=X_train, config_path=config_path)
-    # json_writer(config_path, params)
+    params = param_search(X_train=X_train, config_path=config_path)
+    json_writer(config_path, params)
 
     with open(config_path, "r") as f:
         config = json.loads(f.read())

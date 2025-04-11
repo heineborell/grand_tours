@@ -118,14 +118,24 @@ def json_writer(config_path, best_params, rider_id=None):
     # save to the new json file (dropped the hyperparameter search range) if
     # it is training it saves config_{tour}_training-{year}_all.json
     # if its race it save as config_{tour}_{year}_all.json
-    if config["training"] and rider_id is None:
-        json_saver(config_path.parent / f"config_{tour}_training-{year}_all.json", config)
-    elif not config["training"] and rider_id is None:
-        json_saver(config_path.parent / f"config_{tour}-{year}_all.json", config)
-    elif config["training"] and rider_id is not None:
-        extend_json_file(config_path.parent / f"config_{tour}_training-{year}_individual.json", config)
-    elif not config["training"] and rider_id is None:
-        extend_json_file(config_path.parent / f"config_{tour}-{year}_individual.json", config)
+    if len(year) > 1:
+        if config["training"] and rider_id is None:
+            json_saver(config_path.parent / f"config_{tour}_training_all.json", config)
+        elif not config["training"] and rider_id is None:
+            json_saver(config_path.parent / f"config_{tour}_all.json", config)
+        elif config["training"] and rider_id is not None:
+            extend_json_file(config_path.parent / f"config_{tour}_training_individual.json", config)
+        elif not config["training"] and rider_id is None:
+            extend_json_file(config_path.parent / f"config_{tour}_individual.json", config)
+    else:
+        if config["training"] and rider_id is None:
+            json_saver(config_path.parent / f"config_{tour}_training-{year[0]}_all.json", config)
+        elif not config["training"] and rider_id is None:
+            json_saver(config_path.parent / f"config_{tour}-{year[0]}_all.json", config)
+        elif config["training"] and rider_id is not None:
+            extend_json_file(config_path.parent / f"config_{tour}_training-{year[0]}_individual.json", config)
+        elif not config["training"] and rider_id is None:
+            extend_json_file(config_path.parent / f"config_{tour}-{year[0]}_individual.json", config)
 
 
 def json_saver(path, config):

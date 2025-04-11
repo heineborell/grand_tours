@@ -7,11 +7,11 @@ from training.trainer import Trainer
 
 
 def kfold_split_train(X_train, config, kfold):
-    # create empty dataframe
-    df = pd.DataFrame(columns=["Model", "cv_rmse", "features", "x_train_length"])
     # make empty rmse holder
+    n_splits = kfold.n_splits
     models = list(config["models"].keys())
-    cv_rmses = np.zeros((5, len(models)))
+    cv_rmses = np.zeros((n_splits, len(models)))
+    cv_mape = np.zeros((n_splits, len(models)))
     # loop through all splits
     for i, (train_index, test_index) in enumerate(
         tqdm(kfold.split(X_train), total=kfold.n_splits, desc="Processing Kfold")
@@ -19,6 +19,7 @@ def kfold_split_train(X_train, config, kfold):
         ## get train and holdout sets
         X_train_train = X_train.iloc[train_index]
         X_holdout = X_train.iloc[test_index]
+        xtrain_len = len(X_train_train)
 
         # loop through all models
         for j, model in enumerate(models):
@@ -27,14 +28,16 @@ def kfold_split_train(X_train, config, kfold):
             score = trainer.evaluate(X_holdout[config["features"]], X_holdout[config["target"]])
 
             # record rmse
-            cv_rmses[i, j] = score
-            xtrain_len = len(X_train_train[config["features"]])
+            cv_rmses[i, j] = score[0]
+            # record mape
+            cv_mape[i, j] = score[1]
 
     df = pd.DataFrame(
         {
             "Model": models,
             "cv_rmse": np.mean(cv_rmses, axis=0),
-            "x_tr_tr_len": xtrain_len,
+            "cv_mape": np.mean(cv_mape, axis=0),
+            "x_tr_tr_len": [xtrain_len] * len(models),
             "features": len(models) * [config["features"]],
         }
     )

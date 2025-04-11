@@ -1,7 +1,12 @@
 {
     "training": true,
     "tour": "tdf",
-    "year": 2024,
+    "year": [
+        2021,
+        2022,
+        2023,
+        2024
+    ],
     "features": [
         "distance",
         "elevation",

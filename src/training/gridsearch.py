@@ -120,22 +120,32 @@ def json_writer(config_path, best_params, rider_id=None):
     # if its race it save as config_{tour}_{year}_all.json
     if len(year) > 1:
         if config["training"] and rider_id is None:
-            json_saver(config_path.parent / f"config_{tour}_training_all.json", config)
+            new_config = config_path.parent / f"config_{tour}_training_all.json"
+            json_saver(new_config, config)
         elif not config["training"] and rider_id is None:
-            json_saver(config_path.parent / f"config_{tour}_all.json", config)
+            new_config = config_path.parent / f"config_{tour}_all.json"
+            json_saver(new_config, config)
         elif config["training"] and rider_id is not None:
-            extend_json_file(config_path.parent / f"config_{tour}_training_individual.json", config)
+            new_config = config_path.parent / f"config_{tour}_training_individual.json"
+            extend_json_file(new_config, config)
         elif not config["training"] and rider_id is None:
-            extend_json_file(config_path.parent / f"config_{tour}_individual.json", config)
+            new_config = config_path.parent / f"config_{tour}_individual.json"
+            extend_json_file(new_config, config)
     else:
         if config["training"] and rider_id is None:
-            json_saver(config_path.parent / f"config_{tour}_training-{year[0]}_all.json", config)
+            new_config = config_path.parent / f"config_{tour}_training-{year[0]}_all.json"
+            json_saver(new_config, config)
         elif not config["training"] and rider_id is None:
-            json_saver(config_path.parent / f"config_{tour}-{year[0]}_all.json", config)
+            new_config = config_path.parent / f"config_{tour}-{year[0]}_all.json"
+            json_saver(new_config, config)
         elif config["training"] and rider_id is not None:
-            extend_json_file(config_path.parent / f"config_{tour}_training-{year[0]}_individual.json", config)
+            new_config = config_path.parent / f"config_{tour}_training-{year[0]}_individual.json"
+            extend_json_file(new_config, config)
         elif not config["training"] and rider_id is None:
-            extend_json_file(config_path.parent / f"config_{tour}-{year[0]}_individual.json", config)
+            new_config = config_path.parent / f"config_{tour}-{year[0]}_individual.json"
+            extend_json_file(new_config, config)
+
+    return new_config
 
 
 def json_saver(path, config):
@@ -166,7 +176,7 @@ def extend_json_file(file_path, new_data):
 
     # Check for duplicate strava_id
     if new_data["strava_id"] in {i["strava_id"] for i in data}:
-        print("Already scraped")
+        print("Already searched.")
         return  # Exit without modifying the file
     data.append(new_data)
 

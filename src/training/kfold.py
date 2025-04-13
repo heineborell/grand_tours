@@ -34,6 +34,7 @@ def kfold_split_train(X_train, config, kfold):
 
     df = pd.DataFrame(
         {
+            "strava_id": [config["strava_id"]] * len(models),
             "Model": models,
             "cv_rmse": np.mean(cv_rmses, axis=0),
             "cv_mape": np.mean(cv_mape, axis=0),

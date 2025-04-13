@@ -29,18 +29,25 @@ if __name__ == "__main__":
     print(f"The number of riders is {total_riders}.")
 
     for year in years:
-        for id in list(rider_list):
-            rider = get_rider(id, tour, year, DB_PATH, training=True, segment_data=True)
-            if rider:  # Ensure rider is not None
-                if rider.to_segment_df() is not None:
-                    print(f"rider id:{id}", len(rider.to_segment_df()))
-                    data = rider.to_segment_df()
-                    print(data[["distance", "vertical", "grade", "time"]].isnull().sum())
-                    create_features(data, training=True)
-                    data = data.head(10)
+        for i, id in enumerate(list(rider_list)):
+            try:
+                rider = get_rider(id, tour, year, DB_PATH, training=True, segment_data=True)
+                if rider:  # Ensure rider is not None
+                    if rider.to_segment_df() is not None:
+                        print(
+                            f"rider id:{id}. Rider {i}/{len(rider_list)}.",
+                            f"Number of segments {len(rider.to_segment_df())}.",
+                        )
+                        data = rider.to_segment_df()
+                        print(data[["distance", "vertical", "grade", "time"]].isnull().sum())
+                        create_features(data, training=True)
 
-                    # # Splitting train and test
-                    X_train, X_test = train_test_split(data, test_size=0.2, random_state=42)
+                        # # Splitting train and test
+                        X_train, X_test = train_test_split(data, test_size=0.2, random_state=42)
 
-                    params = param_search(X_train=X_train, config_path=config_path)
-                    train_config_path = json_writer(config_path, params, id)
+                        params = param_search(X_train=X_train, config_path=config_path)
+                        json_writer(config_path, params, id)
+                    else:
+                        print(f"[bold pink] The rider {id} has no training rides. [/bold pink]")
+            except Exception as e:
+                print(f"Error processing rider {id}: {e}")

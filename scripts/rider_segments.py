@@ -26,6 +26,8 @@ if __name__ == "__main__":
 
     # Get rider list
     rider_list = fetch_riders(DB_PATH, tour, years[0])
+    total_riders = len(rider_list)
+    print(f"The number of riders is {total_riders}.")
 
     # for id in list(rider_list):
     #     rider = get_rider(id, tour, year, DB_PATH, training=True, segment_data=True)

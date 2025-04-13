@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 
 from rich import print
@@ -6,7 +5,7 @@ from sklearn.model_selection import KFold, train_test_split
 from xgboost import training
 
 from data.data_loader import config_loader
-from data.database import get_rider
+from data.database import get_rider, get_rider_config
 from data.processing import create_features, fetch_riders
 from training.gridsearch import json_writer, param_search
 from training.kfold import kfold_split_train
@@ -38,20 +37,15 @@ if __name__ == "__main__":
     data = rider.to_segment_df()
     print(data[["distance", "vertical", "grade", "time"]].isnull().sum())
     create_features(data, training=True)
-    # data = data.head(10)
+    data = data.head(10)
 
     # # Splitting train and test
     X_train, X_test = train_test_split(data, test_size=0.2, random_state=42)
 
     params = param_search(X_train=X_train, config_path=config_path)
     train_config_path = json_writer(config_path, params, rider_id)
-    print(train_config_path)
-
-    with open(train_config_path, "r") as f:
-        train_config = json.loads(f.read())
 
     kfold = KFold(n_splits=5, shuffle=True, random_state=31)
-    print(train_config)
-    print(train_config[0]["strava_id"])
+    rider_config = get_rider_config(train_config_path, rider_id)
 
-    kfold_split_train(X_train=X_train, config=train_config[0], kfold=kfold)
+    kfold_split_train(X_train=X_train, config=rider_config, kfold=kfold)

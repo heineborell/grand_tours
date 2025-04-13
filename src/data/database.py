@@ -153,6 +153,13 @@ def get_rider(athlete_id, tour, year, db_path, training=True, segment_data=False
     return rider
 
 
+def get_rider_config(path, strava_id):
+    with open(path, "r") as f:
+        config = json.loads(f.read())
+
+    return next((d for d in config if d.get("strava_id") == strava_id), None)
+
+
 def get_race_day(grand_tours_db_path):
     # get the first day for all races
     race_day_list_full = get_first_day_race(grand_tours_db_path)

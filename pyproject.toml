@@ -14,8 +14,8 @@ dependencies = [
     'rich',
     "xgboost",
     "tdqm",
-    "matplotlib"
-
+    "matplotlib",
+    "seaborn"
 ]
 
 [project.optional-dependencies]

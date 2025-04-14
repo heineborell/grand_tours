@@ -1,7 +1,9 @@
+import json
 from pathlib import Path
 
 from rich import print as print
 
+from data.processing import create_features, get_rider
 from data.segment_analyse import segment_analyser, stage_list_getter
 
 if __name__ == "__main__":
@@ -12,8 +14,24 @@ if __name__ == "__main__":
 
     # Enter tour, year of your choice
     tour = "tdf"
-    year = 2023
+    years = [2023]
 
-    the_stage = stage_list_getter(db_path=DB_PATH, tour=tour, year=year)[4]
-    df = segment_analyser(DB_PATH, the_stage, tour, year)
-    print(df)
+    for year in years:
+        stage_list = stage_list_getter(db_path=DB_PATH, tour=tour, year=year)
+        for stage in stage_list:
+            segment_df = segment_analyser(DB_PATH, stage, tour, year)
+
+    for year in years:
+        with open(PROJECT_ROOT / f"config/config_{tour}_training-{year}_individual.json", "r") as f:
+            train_config = json.loads(f.read())
+        rider_list = [conf["strava_id"] for conf in train_config]
+        for i, id in enumerate(list(rider_list)):
+            rider = get_rider(id, tour, year, DB_PATH, training=False, segment_data=True)
+            if rider:  # Ensure rider is not None
+                if rider.to_segment_df() is not None:
+                    print(
+                        f"rider id:{id}. Rider {i}/{len(rider_list)}.",
+                        f"Number of segments {len(rider.to_segment_df())}.",
+                    )
+                    data = rider.to_segment_df()
+                    create_features(data, training=False)

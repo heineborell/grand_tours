@@ -61,4 +61,8 @@ def create_features(data, training):
         print("No elevation data.")
     if training:
         data = data.drop(index=data.loc[data["ride_day"] > data["race_start_day"]].index)
+        data = data.drop(index=data.loc[data["ride_day"] == data["race_start_day"]].index)
+        data = data.drop(index=data.loc[data["distance"] < 10].index)
+        data = data.drop(index=data.loc[data["elevation"] < 10].index)
+        data.dropna(subset=["distance", "elevation", "VAM", "time_delta"])
     return data

@@ -2,10 +2,9 @@ import json
 from pathlib import Path
 
 from rich import print as print
-from sklearn.model_selection import KFold, train_test_split
+from sklearn.model_selection import train_test_split
 
 from data.processing import create_features, get_rider
-from training.kfold import kfold_split_train
 
 if __name__ == "__main__":
     # Get the absolute path of the project root dynamically
@@ -22,7 +21,7 @@ if __name__ == "__main__":
         with open(PROJECT_ROOT / f"config/config_{tour}_training-{year}_individual.json", "r") as f:
             train_config = json.loads(f.read())
         rider_list = [conf["strava_id"] for conf in train_config]
-        for i, id in enumerate(list(rider_list)):
+        for i, id in enumerate(list(rider_list)[0:1]):
             try:
                 rider = get_rider(id, tour, year, DB_PATH, training=True, segment_data=True)
                 if rider:  # Ensure rider is not None
@@ -38,7 +37,8 @@ if __name__ == "__main__":
                         X_train, X_test = train_test_split(data, test_size=0.2, random_state=42)
                         config = next((item for item in train_config if item["strava_id"] == id), None)
 
-                        kfold = KFold(n_splits=5, shuffle=True, random_state=31)
-                        kfold_split_train(X_train, config, kfold)
+                        print(X_train)
+                        # kfold = KFold(n_splits=5, shuffle=True, random_state=31)
+                        # kfold_split_train(X_train, config, kfold)
             except Exception as e:
                 print(f"Error processing rider {id}: {e}")

@@ -40,10 +40,5 @@ if __name__ == "__main__":
 
                         kfold = KFold(n_splits=5, shuffle=True, random_state=31)
                         kfold_split_train(X_train, config, kfold)
-            #
-            #                     params = param_search(X_train=X_train, config_path=config_path)
-            #                     json_writer(config_path, params, id)
-            #                 else:
-            #                     print(f"[bold pink] The rider {id} has no training rides. [/bold pink]")
             except Exception as e:
                 print(f"Error processing rider {id}: {e}")

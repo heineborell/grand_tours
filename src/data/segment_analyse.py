@@ -1,6 +1,12 @@
 """This module is mostly written by chatgpt is has to be reviewed!"""
 
 import ast
+import json
+import os
+import sqlite3
+
+import pandas as pd
+from rich import print
 
 
 def check_overlap(segment1: list[int], segment2: list[int]) -> bool:
@@ -177,3 +183,50 @@ def name_getter(stage_df, reduced_segments):
         index_list.append([ast.literal_eval(k) for k in stage_df["end_points"]].index(seg))
 
     return stage_df.iloc[index_list]
+
+
+def stage_list_getter(db_path, tour, year):
+    """Given tour, year and database path it returns a list of stages"""
+    # Load config
+    with open(db_path, "r") as f:
+        json_data = json.loads(f.read())
+
+    # # selects the grand_tours database path from path json file
+    segment_details_db_path = os.path.expanduser(json_data["global"]["segment_details_db_path"])
+
+    conn = sqlite3.connect(segment_details_db_path)
+    query = f"SELECT DISTINCT(stage) FROM  segment_details_data WHERE tour_year='{tour}-{year}'"
+    stages = conn.execute(query).fetchall()
+    return [stage[0] for stage in stages]
+
+
+def segment_getter(db_path, stage, tour, year):
+    """Given stage, tour, year and database path it returns a dataframe of segments"""
+    # Load config
+    with open(db_path, "r") as f:
+        json_data = json.loads(f.read())
+
+    # # selects the grand_tours database path from path json file
+    segment_details_db_path = os.path.expanduser(json_data["global"]["segment_details_db_path"])
+
+    conn = sqlite3.connect(segment_details_db_path)
+    query = f"SELECT * FROM segment_details_data WHERE tour_year='{tour}-{year}' AND stage='{stage}' "
+
+    # Load the result directly into a DataFrame
+    df = pd.read_sql_query(query, conn)
+    return df
+
+
+def segment_analyser(db_path, stage, tour, year):
+    # First get the segment dataframe given stage, tour, year
+    segment_df = segment_getter(db_path, stage, tour, year)
+
+    # From the segment_df get list of end_points for picking, also can impose additional constraints
+    # for example here we impose segments should be shorter than 270.
+    segment_end_points = [ast.literal_eval(segment) for segment in segment_df["end_points"]]
+    segment_end_points = [i for i in segment_end_points if i[1] - i[0] < 270]
+
+    # segment_picker generates three possible coverage given a list
+    # here I choose the maximum coverage
+    df_fin = name_getter(segment_df, segment_picker(segment_end_points)[1])
+    return df_fin

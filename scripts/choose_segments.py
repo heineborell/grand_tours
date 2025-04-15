@@ -34,4 +34,5 @@ if __name__ == "__main__":
                         f"Number of segments {len(rider.to_segment_df())}.",
                     )
                     data = rider.to_segment_df()
-                    create_features(data, training=False)
+                    data = create_features(data, training=False)
+                    print(data)

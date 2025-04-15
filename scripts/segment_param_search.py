@@ -41,6 +41,7 @@ if __name__ == "__main__":
                         data = rider.to_segment_df()
                         data = create_features(data, training=True)
                         print(data[["distance", "vertical", "grade", "time"]].isnull().sum())
+                        print(data)
 
                         # # Splitting train and test
                         X_train, X_test = train_test_split(data, test_size=0.2, random_state=42)

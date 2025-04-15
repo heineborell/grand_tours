@@ -5,6 +5,8 @@ from pathlib import Path
 
 from rich import print
 from sklearn.model_selection import GridSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 from tqdm import tqdm  # Import tqdm for progress bar
 
 from training.trainer import Trainer
@@ -63,18 +65,28 @@ def gridder(model, pbar, **kwargs):
     # Load config
     with open(config_path, "r") as f:
         config = json.loads(f.read())
+
     # Define the parameter grid to search over
     param_grid = config["models"][model]["param_grid"]
+    # prefix model__ for the parameter grid dict. Because gridsearchcv needs it for pipeline
+    param_grid = {f"model__{k}": v for k, v in param_grid.items()}
+
     if not param_grid:
         print(f"[bold red] No hyperparameter for {model} [/bold red]")
         pbar.update(100)  # Complete the progress bar
         return None
 
     else:
-        # Create a GridSearchCV object
+        # Call bare models i.e. models without parameters
         model_bare = Trainer(model, hyperparams=None)
+
+        # Build pipeline: scaler + model
+        pipeline = Pipeline(
+            [("scaler", StandardScaler()), ("model", model_bare._get_model(model, hyperparams=None).model)]
+        )
+        # Create a GridSearchCV object
         grid_search = GridSearchCV(
-            estimator=model_bare._get_model(model, hyperparams=None).model,
+            estimator=pipeline,
             param_grid=param_grid,
             cv=5,
             scoring="neg_root_mean_squared_error",
@@ -83,6 +95,7 @@ def gridder(model, pbar, **kwargs):
         # Update progress to show we're starting the fit
         pbar.update(10)
         pbar.refresh()
+
         # Fit the grid search to the training data
         grid_search.fit(X_train[config["features"]], X_train[config["target"]])
 

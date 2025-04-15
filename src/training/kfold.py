@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from rich import print
+from sklearn.preprocessing import StandardScaler
 from tqdm import tqdm
 
 from training.trainer import Trainer
@@ -12,6 +13,7 @@ def kfold_split_train(X_train, config, kfold):
     models = list(config["models"].keys())
     cv_rmses = np.zeros((n_splits, len(models)))
     cv_mape = np.zeros((n_splits, len(models)))
+
     # loop through all splits
     for i, (train_index, test_index) in enumerate(
         tqdm(kfold.split(X_train), total=kfold.n_splits, desc="Processing Kfold")
@@ -21,11 +23,19 @@ def kfold_split_train(X_train, config, kfold):
         X_holdout = X_train.iloc[test_index]
         xtrain_len = len(X_train_train)
 
+        # Scale features within the fold
+        scaler = StandardScaler()
+        X_train_scaled = scaler.fit_transform(X_train_train[config["features"]])
+        X_holdout_scaled = scaler.transform(X_holdout[config["features"]])
+
+        y_train = X_train_train[config["target"]]
+        y_holdout = X_holdout[config["target"]]
+
         # loop through all models
         for j, model in enumerate(models):
             trainer = Trainer(model, config["models"][model]["hyperparameters"])
-            trainer.train(X_train_train[config["features"]], X_train_train[config["target"]])
-            score = trainer.evaluate(X_holdout[config["features"]], X_holdout[config["target"]])
+            trainer.train(X_train_scaled, y_train)
+            score = trainer.evaluate(X_holdout_scaled, y_holdout)
 
             # record rmse
             cv_rmses[i, j] = score[0]

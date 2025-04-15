@@ -2,7 +2,7 @@
     "training": true,
     "tour": "giro",
     "year": 2023,
-    "strava_id": None,
+    "strava_id": null,
     "features": [
         "distance",
         "elevation",

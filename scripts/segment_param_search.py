@@ -18,7 +18,7 @@ if __name__ == "__main__":
     # Enter tour and set if it is training or race, here we merged all years together
     tour = "tdf"
     training = True
-    years = [2022]
+    years = [2021]
 
     # Open base config and prepare it for parameter search by entering the tour and years you selected
     config_path = Path(config_loader(tour, years, config_path=CONFIG_PATH))

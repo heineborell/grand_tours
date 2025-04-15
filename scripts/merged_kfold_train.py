@@ -1,5 +1,4 @@
 import json
-import subprocess
 from pathlib import Path
 
 import pandas as pd
@@ -18,7 +17,7 @@ if __name__ == "__main__":
 
     # Enter tour, year of your choice
     tour = "tdf"
-    years = [2021]
+    years = [2021, 2022, 2023, 2024]
     data_list = []
 
     for year in years:
@@ -29,7 +28,7 @@ if __name__ == "__main__":
 
     data = pd.concat(data_list)
     # data = data.head(1000)
-    subprocess.run(["vd", "-f", "csv", "-"], input=data.to_csv(index=False), text=True)
+    # subprocess.run(["vd", "-f", "csv", "-"], input=data.to_csv(index=False), text=True)
 
     # Splitting train and test
     X_train, X_test = train_test_split(data, test_size=0.2, random_state=42)

@@ -10,7 +10,8 @@
     "features": [
         "distance",
         "elevation",
-        "time_delta"
+        "time_delta",
+        "VAM"
     ],
     "target": "time",
     "models": {
@@ -20,14 +21,14 @@
         "random_forest_regressor": {
             "hyperparameters": {
                 "min_samples_leaf": 2,
-                "n_estimators": 600
+                "n_estimators": 300
             }
         },
         "xgboost": {
             "hyperparameters": {
                 "learning_rate": 0.1,
                 "max_depth": 7,
-                "n_estimators": 400
+                "n_estimators": 300
             }
         },
         "linearsvr": {

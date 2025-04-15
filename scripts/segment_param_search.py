@@ -18,7 +18,7 @@ if __name__ == "__main__":
     # Enter tour and set if it is training or race, here we merged all years together
     tour = "tdf"
     training = True
-    years = [2021]
+    years = [2024]
 
     # Open base config and prepare it for parameter search by entering the tour and years you selected
     config_path = Path(config_loader(tour, years, config_path=CONFIG_PATH))
@@ -39,9 +39,8 @@ if __name__ == "__main__":
                             f"Number of segments {len(rider.to_segment_df())}.",
                         )
                         data = rider.to_segment_df()
+                        data = create_features(data, training=True)
                         print(data[["distance", "vertical", "grade", "time"]].isnull().sum())
-                        print(data["tour_year"].unique())
-                        create_features(data, training=True)
 
                         # # Splitting train and test
                         X_train, X_test = train_test_split(data, test_size=0.2, random_state=42)

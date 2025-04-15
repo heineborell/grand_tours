@@ -61,5 +61,5 @@ def create_features(data, training):
         print("No elevation data.")
     if training:
         data = data.drop(index=data.loc[data["ride_day"] > data["race_start_day"]].index)
-        data = data.drop(index=data.loc[data["ride_day"] == data["race_start_day"]].index)
+        data = data.drop(index=data.loc[data["time_delta"] <= 0].index)
     return data

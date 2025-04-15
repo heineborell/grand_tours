@@ -66,7 +66,7 @@ class Rider(BaseModel):
                         "stage": activity.stage,
                         "ride_day": activity.ride_date,
                         "race_start_day": activity.race_start_day,
-                        "name": segment.name,
+                        "segment_name": segment.name,
                         "distance": segment.dist,
                         "time": segment.time,
                         "vertical": segment.vert,

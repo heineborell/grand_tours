@@ -1,4 +1,5 @@
 import json
+import subprocess
 from pathlib import Path
 
 import pandas as pd
@@ -21,17 +22,18 @@ if __name__ == "__main__":
     for year in years:
         stage_list = stage_list_getter(db_path=DB_PATH, tour=tour, year=year)
         for stage in stage_list:
-            segment_df = segment_analyser(DB_PATH, stage, tour, year)
+            segment_df = segment_analyser(DB_PATH, stage, tour, year, hidden=False)
             segment_df_full = pd.concat([segment_df_full, segment_df])
 
     print(segment_df_full.groupby(["stage"]).count())
     print(segment_df_full["coverage"].unique())
+    # print(segment_df_full)
 
     for year in years:
         with open(PROJECT_ROOT / f"config/config_{tour}_training-{year}_individual.json", "r") as f:
             train_config = json.loads(f.read())
         rider_list = [conf["strava_id"] for conf in train_config]
-        for i, id in enumerate(list(rider_list)[0:1]):
+        for i, id in enumerate(list(rider_list)[10:11]):
             rider = get_rider(id, tour, year, DB_PATH, training=False, segment_data=True)
             if rider:  # Ensure rider is not None
                 if rider.to_segment_df() is not None:
@@ -41,4 +43,7 @@ if __name__ == "__main__":
                     )
                     data = rider.to_segment_df()
                     data = create_features(data, training=False)
-    print(data)
+
+        finn = segment_df_full.merge(data, how="left", on=["segment_name"])
+
+        subprocess.run(["vd", "-f", "csv", "-"], input=finn.to_csv(index=False), text=True)

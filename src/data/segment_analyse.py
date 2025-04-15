@@ -4,6 +4,7 @@ import ast
 import json
 import os
 import sqlite3
+from bisect import bisect_right
 
 import pandas as pd
 from rich import print
@@ -16,116 +17,64 @@ def check_overlap(segment1: list[int], segment2: list[int]) -> bool:
     return not (segment1[1] <= segment2[0] or segment2[1] <= segment1[0])
 
 
-def find_compatible_segments(segments: list[list[int]], current_idx: int) -> list[int]:
-    """
-    Find all segments that are compatible (non-overlapping) with given segment
-    """
-    current = segments[current_idx]
-    compatible = []
-
-    for i, segment in enumerate(segments[:current_idx]):
-        if not check_overlap(current, segment):
-            compatible.append(i)
-
-    return compatible
-
-
 def optimize_segments(segments: list[list[int]], prefer_longest_segments: bool = True) -> list[list[int]]:
     """
     Find the optimal non-overlapping segments that either:
     1. Maximize total distance covered (prefer_longest_segments=False)
     2. Prefer longer individual segments (prefer_longest_segments=True)
     """
+    if not segments:
+        return []
+
     if prefer_longest_segments:
         # Sort by length (descending), then by end position for tie-breaking
         sorted_segments = sorted(segments, key=lambda x: (-(x[1] - x[0]), x[1]))
-
         selected = []
         for segment in sorted_segments:
-            # Check if this segment overlaps with any selected segments
-            is_overlapping = any(check_overlap(segment, selected_segment) for selected_segment in selected)
-
+            is_overlapping = any(check_overlap(segment, s) for s in selected)
             if not is_overlapping:
-                # Check if this segment contains or is contained by other segments
-                contains_smaller = False
-                selected_to_remove = []
-
-                for selected_segment in selected:
-                    if segment[0] <= selected_segment[0] and segment[1] >= selected_segment[1]:
-                        # Current segment completely contains a selected segment
-                        selected_to_remove.append(selected_segment)
-                    elif selected_segment[0] <= segment[0] and selected_segment[1] >= segment[1]:
-                        # Current segment is contained within a selected segment
-                        contains_smaller = True
-                        break
-
-                if not contains_smaller:
-                    # Remove any smaller segments this one contains
-                    for to_remove in selected_to_remove:
-                        selected.remove(to_remove)
+                # Remove any segments fully contained in the new one
+                selected = [s for s in selected if not (segment[0] <= s[0] and segment[1] >= s[1])]
+                # Skip if it’s contained within a previously selected segment
+                if not any(s[0] <= segment[0] and s[1] >= segment[1] for s in selected):
                     selected.append(segment)
+        return sorted(selected, key=lambda x: x[0])
 
-    else:
-        # For maximum coverage, use dynamic programming with overlap checking
-        sorted_segments = sorted(segments, key=lambda x: (x[0], -x[1]))  # Sort by start, then length
-        n = len(segments)
+    # Weighted interval scheduling: maximize total coverage
+    # Step 1: Sort segments by end
+    sorted_segments = sorted(segments, key=lambda x: x[1])
+    ends = [s[1] for s in sorted_segments]
+    weights = [e - s for s, e in sorted_segments]
+    n = len(segments)
 
-        if n == 0:
-            return []
+    # Step 2: Compute p(i): last non-overlapping segment before i
+    p = []
+    for i in range(n):
+        j = bisect_right(ends, sorted_segments[i][0]) - 1
+        p.append(j)
 
-        # dp[i] stores the maximum coverage we can get using segments[0..i]
-        dp = [(0, []) for _ in range(n)]  # Store value and segments used
+    # Step 3: DP table to store max coverage
+    dp = [0] * n
+    selected_indices = [[] for _ in range(n)]
 
-        # Base case
-        dp[0] = (sorted_segments[0][1] - sorted_segments[0][0], [0])
+    for i in range(n):
+        incl = weights[i] + (dp[p[i]] if p[i] != -1 else 0)
+        excl = dp[i - 1] if i > 0 else 0
 
-        # Fill dp table
-        for i in range(1, n):
-            current = sorted_segments[i]
-            current_length = current[1] - current[0]
+        if incl > excl:
+            dp[i] = incl
+            selected_indices[i] = (selected_indices[p[i]] if p[i] != -1 else []) + [i]
+        else:
+            dp[i] = excl
+            selected_indices[i] = selected_indices[i - 1] if i > 0 else []
 
-            # Find best compatible combination
-            best_value = current_length
-            best_segments = [i]
-
-            # Check all compatible previous segments
-            for j in range(i):
-                if not check_overlap(current, sorted_segments[j]):
-                    prev_value, prev_segments = dp[j]
-                    # Check if adding current segment to this combination creates overlaps
-                    is_compatible = True
-                    for seg_idx in prev_segments:
-                        if check_overlap(current, sorted_segments[seg_idx]):
-                            is_compatible = False
-                            break
-
-                    if is_compatible:
-                        total_value = prev_value + current_length
-                        if total_value > best_value:
-                            best_value = total_value
-                            best_segments = prev_segments + [i]
-
-            # Compare with previous best without current segment
-            prev_value, prev_segments = dp[i - 1]
-            if prev_value > best_value:
-                best_value = prev_value
-                best_segments = prev_segments
-
-            dp[i] = (best_value, best_segments)
-
-        # Get the final solution
-        _, selected_indices = dp[n - 1]
-        selected = [sorted_segments[i] for i in selected_indices]
-
-    # Sort final result by start position
-    return sorted(selected, key=lambda x: x[0])
+    return [sorted_segments[i] for i in selected_indices[-1]]
 
 
 def analyze_solution(result: list[list[int]]):
     """
     Analyze and print statistics about the solution
     """
-    # Verify no overlaps
     for i, seg1 in enumerate(result):
         for seg2 in result[i + 1 :]:
             if check_overlap(seg1, seg2):
@@ -133,7 +82,7 @@ def analyze_solution(result: list[list[int]]):
 
     total_coverage = sum(end - start for start, end in result)
     segment_lengths = [end - start for start, end in result]
-    avg_segment_length = sum(segment_lengths) / len(segment_lengths)
+    avg_segment_length = sum(segment_lengths) / len(segment_lengths) if segment_lengths else 0
 
     print(f"Number of segments: {len(result)}")
     print(f"Total coverage: {total_coverage} meters")
@@ -145,27 +94,18 @@ def analyze_solution(result: list[list[int]]):
 
 def greedy_picker(segments):
     ordered_list = sorted(segments, key=lambda x: x[1])
-
     selected = []
-    for i, elmt in enumerate(ordered_list):
-        if i == 0:
+    for elmt in ordered_list:
+        if not selected or selected[-1][1] <= elmt[0]:
             selected.append(elmt)
-        elif i > 0:
-            if float(selected[-1][-1]) < float(elmt[0]):
-                selected.append(elmt)
-            else:
-                pass
-
-    # Sort final result by start position
     return sorted(selected, key=lambda x: x[0])
 
 
 def segment_picker(segments, report=False):
     longest_segments = optimize_segments(segments, prefer_longest_segments=True)
-
     max_coverage = optimize_segments(segments, prefer_longest_segments=False)
-
     greedy = greedy_picker(segments)
+
     if report:
         print("\nOptimizing for longest segments:")
         analyze_solution(longest_segments)
@@ -193,11 +133,9 @@ def name_getter(stage_df, reduced_segments):
 
 def stage_list_getter(db_path, tour, year):
     """Given tour, year and database path it returns a list of stages"""
-    # Load config
     with open(db_path, "r") as f:
         json_data = json.loads(f.read())
 
-    # # selects the grand_tours database path from path json file
     segment_details_db_path = os.path.expanduser(json_data["global"]["segment_details_db_path"])
 
     conn = sqlite3.connect(segment_details_db_path)
@@ -208,31 +146,25 @@ def stage_list_getter(db_path, tour, year):
 
 def segment_getter(db_path, stage, tour, year):
     """Given stage, tour, year and database path it returns a dataframe of segments"""
-    # Load config
     with open(db_path, "r") as f:
         json_data = json.loads(f.read())
 
-    # # selects the grand_tours database path from path json file
     segment_details_db_path = os.path.expanduser(json_data["global"]["segment_details_db_path"])
-
     conn = sqlite3.connect(segment_details_db_path)
     query = f"SELECT * FROM segment_details_data WHERE tour_year='{tour}-{year}' AND stage='{stage}' "
-
-    # Load the result directly into a DataFrame
     df = pd.read_sql_query(query, conn)
     return df
 
 
-def segment_analyser(db_path, stage, tour, year):
-    # First get the segment dataframe given stage, tour, year
+def segment_analyser(db_path, stage, tour, year, hidden=False):
     segment_df = segment_getter(db_path, stage, tour, year)
-
-    # From the segment_df get list of end_points for picking, also can impose additional constraints
-    # for example here we impose segments should be shorter than 270.
-    segment_end_points = [ast.literal_eval(segment) for segment in segment_df["end_points"]]
+    # segment_df = segment_df[ast.literal_eval(segment_df["hidden"])]
+    if not hidden:
+        segment_end_points = [
+            ast.literal_eval(segment) for segment in segment_df.loc[segment_df["hidden"] == "False", "end_points"]
+        ]
+    else:
+        segment_end_points = [ast.literal_eval(segment) for segment in segment_df["end_points"]]
     segment_end_points = [i for i in segment_end_points if i[1] - i[0] < 270]
-
-    # segment_picker generates three possible coverage given a list
-    # here I choose the maximum coverage
     df_fin = name_getter(segment_df, segment_picker(segment_end_points)[1])
     return df_fin.drop(columns=["segment_id"])

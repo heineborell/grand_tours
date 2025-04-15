@@ -185,7 +185,8 @@ def name_getter(stage_df, reduced_segments):
     reduced_df = stage_df.iloc[index_list]
     intervals = [ast.literal_eval(value) for value in reduced_df["end_points"].to_list()]
     total_diff = sum(b - a for a, b in intervals)
-    reduced_df["coverage"] = total_diff
+    reduced_df = reduced_df.copy()
+    reduced_df.loc[:, "coverage"] = total_diff
 
     return reduced_df
 
@@ -234,4 +235,4 @@ def segment_analyser(db_path, stage, tour, year):
     # segment_picker generates three possible coverage given a list
     # here I choose the maximum coverage
     df_fin = name_getter(segment_df, segment_picker(segment_end_points)[1])
-    return df_fin.drop(columns=["activity_id", "segment_id"])
+    return df_fin.drop(columns=["segment_id"])

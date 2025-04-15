@@ -10,7 +10,6 @@ from training.kfold import kfold_split_train
 if __name__ == "__main__":
     # Get the absolute path of the project root dynamically
     PROJECT_ROOT = Path(__file__).resolve().parent.parent  # Adjust if needed
-    CONFIG_PATH = PROJECT_ROOT / "config/base_config_segments.json"
     DB_PATH = PROJECT_ROOT / "config/db_path.json"
 
     # Enter tour and set if it is training or race, here we merged all years together
@@ -33,6 +32,7 @@ if __name__ == "__main__":
                         )
                         data = rider.to_segment_df()
                         create_features(data, training=True)
+                        print(data)
 
                         # Splitting train and test
                         X_train, X_test = train_test_split(data, test_size=0.2, random_state=42)

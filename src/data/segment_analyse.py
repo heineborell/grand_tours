@@ -160,7 +160,7 @@ def greedy_picker(segments):
     return sorted(selected, key=lambda x: x[0])
 
 
-def segment_picker(segments, report=True):
+def segment_picker(segments, report=False):
     longest_segments = optimize_segments(segments, prefer_longest_segments=True)
 
     max_coverage = optimize_segments(segments, prefer_longest_segments=False)
@@ -182,7 +182,12 @@ def name_getter(stage_df, reduced_segments):
     for seg in reduced_segments:
         index_list.append([ast.literal_eval(k) for k in stage_df["end_points"]].index(seg))
 
-    return stage_df.iloc[index_list]
+    reduced_df = stage_df.iloc[index_list]
+    intervals = [ast.literal_eval(value) for value in reduced_df["end_points"].to_list()]
+    total_diff = sum(b - a for a, b in intervals)
+    reduced_df["coverage"] = total_diff
+
+    return reduced_df
 
 
 def stage_list_getter(db_path, tour, year):
@@ -229,4 +234,4 @@ def segment_analyser(db_path, stage, tour, year):
     # segment_picker generates three possible coverage given a list
     # here I choose the maximum coverage
     df_fin = name_getter(segment_df, segment_picker(segment_end_points)[1])
-    return df_fin
+    return df_fin.drop(columns=["activity_id", "segment_id"])

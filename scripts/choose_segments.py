@@ -20,6 +20,7 @@ if __name__ == "__main__":
         stage_list = stage_list_getter(db_path=DB_PATH, tour=tour, year=year)
         for stage in stage_list:
             segment_df = segment_analyser(DB_PATH, stage, tour, year)
+            print(segment_df)
 
     for year in years:
         with open(PROJECT_ROOT / f"config/config_{tour}_training-{year}_individual.json", "r") as f:
@@ -35,4 +36,4 @@ if __name__ == "__main__":
                     )
                     data = rider.to_segment_df()
                     data = create_features(data, training=False)
-                    print(data)
+                    # print(data)

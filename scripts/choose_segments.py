@@ -1,12 +1,8 @@
-import json
-import subprocess
 from pathlib import Path
 
-import pandas as pd
 from rich import print as print
 
-from data.processing import create_features, get_rider
-from data.segment_analyse import segment_analyser, stage_list_getter
+from data.segment_analyse import get_segment_table, merged_tables
 
 if __name__ == "__main__":
     # Get the absolute path of the project root dynamically
@@ -18,32 +14,8 @@ if __name__ == "__main__":
     tour = "tdf"
     years = [2024]
 
-    segment_df_full = pd.DataFrame()
-    for year in years:
-        stage_list = stage_list_getter(db_path=DB_PATH, tour=tour, year=year)
-        for stage in stage_list:
-            segment_df = segment_analyser(DB_PATH, stage, tour, year, hidden=False)
-            segment_df_full = pd.concat([segment_df_full, segment_df])
+    segment_df_full = get_segment_table(tour, years, DB_PATH)
+    merged_df = merged_tables(tour, years, segment_df_full, PROJECT_ROOT, DB_PATH)
 
-    print(segment_df_full.groupby(["stage"]).count())
-    print(segment_df_full["coverage"].unique())
-    # print(segment_df_full)
-
-    for year in years:
-        with open(PROJECT_ROOT / f"config/config_{tour}_training-{year}_individual.json", "r") as f:
-            train_config = json.loads(f.read())
-        rider_list = [conf["strava_id"] for conf in train_config]
-        for i, id in enumerate(list(rider_list)[10:11]):
-            rider = get_rider(id, tour, year, DB_PATH, training=False, segment_data=True)
-            if rider:  # Ensure rider is not None
-                if rider.to_segment_df() is not None:
-                    print(
-                        f"rider id:{id}. Rider {i}/{len(rider_list)}.",
-                        f"Number of segments {len(rider.to_segment_df())}.",
-                    )
-                    data = rider.to_segment_df()
-                    data = create_features(data, training=False)
-
-        finn = segment_df_full.merge(data, how="left", on=["segment_name"])
-
-        subprocess.run(["vd", "-f", "csv", "-"], input=finn.to_csv(index=False), text=True)
+    print(segment_df_full)
+    print(merged_df)

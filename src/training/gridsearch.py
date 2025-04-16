@@ -118,6 +118,11 @@ def json_writer(config_path, best_params, rider_id=None):
 
     tour = config["tour"]
     year = config["year"]
+    print(best_params)
+
+    best_params = {
+        model: {k.replace("model__", "", 1): v for k, v in params.items()} for model, params in best_params.items()
+    }
 
     # change to the parameters you found from gridsearch
     for model in best_params:

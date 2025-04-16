@@ -9,6 +9,9 @@ from bisect import bisect_right
 import pandas as pd
 from rich import print
 
+from data.database import get_rider
+from data.processing import create_features
+
 
 def check_overlap(segment1: list[int], segment2: list[int]) -> bool:
     """
@@ -168,3 +171,32 @@ def segment_analyser(db_path, stage, tour, year, hidden=False):
     segment_end_points = [i for i in segment_end_points if i[1] - i[0] < 270]
     df_fin = name_getter(segment_df, segment_picker(segment_end_points)[1])
     return df_fin.drop(columns=["segment_id"])
+
+
+def get_segment_table(tour, years, db_path):
+    segment_df_full = pd.DataFrame()
+    for year in years:
+        stage_list = stage_list_getter(db_path, tour, year)
+        for stage in stage_list:
+            segment_df = segment_analyser(db_path, stage, tour, year, hidden=False)
+            segment_df_full = pd.concat([segment_df_full, segment_df])
+    return segment_df_full
+
+
+def merged_tables(tour, years, segment_df, project_root, db_path):
+    for year in years:
+        with open(project_root / f"config/config_{tour}_training-{year}_individual.json", "r") as f:
+            train_config = json.loads(f.read())
+        rider_list = [conf["strava_id"] for conf in train_config]
+        for i, id in enumerate(list(rider_list)[10:11]):
+            rider = get_rider(id, tour, year, db_path, training=False, segment_data=True)
+            if rider:  # Ensure rider is not None
+                if rider.to_segment_df() is not None:
+                    print(
+                        f"rider id:{id}. Rider {i}/{len(rider_list)}.",
+                        f"Number of segments {len(rider.to_segment_df())}.",
+                    )
+                    data = rider.to_segment_df()
+                    data = create_features(data, training=False)
+
+        return segment_df.merge(data, how="left", on=["segment_name"])

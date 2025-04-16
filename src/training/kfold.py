@@ -22,6 +22,7 @@ def kfold_split_train(X_train, config, kfold):
         X_train_train = X_train.iloc[train_index]
         X_holdout = X_train.iloc[test_index]
         xtrain_len = len(X_train_train)
+        xholdout_len = len(X_holdout)
 
         # Scale features within the fold
         scaler = StandardScaler()
@@ -49,6 +50,48 @@ def kfold_split_train(X_train, config, kfold):
             "cv_rmse": np.mean(cv_rmses, axis=0),
             "cv_mape": np.mean(cv_mape, axis=0),
             "x_tr_tr_len": [xtrain_len] * len(models),
+            "x_holdout_len": [xholdout_len] * len(models),
+            "features": len(models) * [config["features"]],
+        }
+    )
+    print(df)
+
+
+def tester(X_train, X_test, config):
+    # make empty rmse holder
+    models = list(config["models"].keys())
+    test_rmses = np.zeros(len(models))
+    test_mape = np.zeros(len(models))
+
+    # Scale features
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train[config["features"]])
+    X_test_scaled = scaler.transform(X_test[config["features"]])
+    xtrain_len = len(X_train_scaled)
+    xtest_len = len(X_test_scaled)
+
+    y_train = X_train[config["target"]]
+    y_test = X_test[config["target"]]
+
+    # loop through all models
+    for j, model in enumerate(tqdm(models, total=len(models), desc="Processing Train-Test")):
+        trainer = Trainer(model, config["models"][model]["hyperparameters"])
+        trainer.train(X_train_scaled, y_train)
+        score = trainer.evaluate(X_test_scaled, y_test)
+
+        # record rmse
+        test_rmses[j] = score[0]
+        # record mape
+        test_mape[j] = score[1]
+
+    df = pd.DataFrame(
+        {
+            "strava_id": [config["strava_id"]] * len(models),
+            "Model": models,
+            "test_rmse": test_rmses,
+            "test_mape": test_mape,
+            "x_tr_len": [xtrain_len] * len(models),
+            "x_test_len": [xtest_len] * len(models),
             "features": len(models) * [config["features"]],
         }
     )

@@ -59,17 +59,18 @@ class Rider(BaseModel):
             for segment in activity.segments:
                 rows.append(
                     {
-                        "activity_id": activity.activity_id,
-                        "strava_id": self.strava_id,
+                        "activity_id": int(activity.activity_id),
+                        "strava_id": int(self.strava_id),
                         "rider_name": self.name,
                         "tour_year": activity.tour_year,
                         "stage": activity.stage,
+                        "total_distance": activity.distance,
                         "ride_day": activity.ride_date,
                         "race_start_day": activity.race_start_day,
                         "segment_name": segment.name,
                         "distance": segment.dist,
                         "time": segment.time,
-                        "vertical": segment.vert,
+                        "vertical": int(segment.vert),
                         "grade": segment.grade,
                         "watt": segment.watt,
                         "heart_rate": segment.heart_rate,

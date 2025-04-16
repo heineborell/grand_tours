@@ -188,7 +188,7 @@ def merged_tables(tour, years, segment_df, project_root, db_path):
         with open(project_root / f"config/config_{tour}_training-{year}_individual.json", "r") as f:
             train_config = json.loads(f.read())
         rider_list = [conf["strava_id"] for conf in train_config]
-        for i, id in enumerate(list(rider_list)[10:11]):
+        for i, id in enumerate(list(rider_list)[34:35]):
             rider = get_rider(id, tour, year, db_path, training=False, segment_data=True)
             if rider:  # Ensure rider is not None
                 if rider.to_segment_df() is not None:
@@ -199,4 +199,8 @@ def merged_tables(tour, years, segment_df, project_root, db_path):
                     data = rider.to_segment_df()
                     data = create_features(data, training=False)
 
-        return segment_df.merge(data, how="left", on=["segment_name"])
+            segment_df = segment_df.merge(
+                data.drop(columns=["stage", "ride_day", "race_start_day", "tour_year"]), how="left", on=["segment_name"]
+            )
+            segment_df["dist_total_segments"] = segment_df.groupby("stage")["distance"].transform("sum")
+            return segment_df

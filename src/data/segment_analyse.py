@@ -188,7 +188,8 @@ def merged_tables(tour, years, segment_df, project_root, db_path):
         with open(project_root / f"config/config_{tour}_training-{year}_individual.json", "r") as f:
             train_config = json.loads(f.read())
         rider_list = [conf["strava_id"] for conf in train_config]
-        for i, id in enumerate(list(rider_list)[34:35]):
+        final_table = None
+        for i, id in enumerate(list(rider_list)):
             rider = get_rider(id, tour, year, db_path, training=False, segment_data=True)
             if rider:  # Ensure rider is not None
                 if rider.to_segment_df() is not None:
@@ -198,9 +199,39 @@ def merged_tables(tour, years, segment_df, project_root, db_path):
                     )
                     data = rider.to_segment_df()
                     data = create_features(data, training=False)
+                    data = data.astype(
+                        {
+                            "activity_id": "Int64",
+                            "strava_id": "Int64",
+                            "rider_name": "string",
+                            "tour_year": "string",
+                            "stage": "string",
+                            "total_distance": "float",
+                            "total_elevation": "Int64",
+                            "distance": "float",
+                            "time": "Int64",
+                            "watt": "Int64",
+                            "heart_rate": "Int64",
+                        }
+                    )
 
-            segment_df = segment_df.merge(
-                data.drop(columns=["stage", "ride_day", "race_start_day", "tour_year"]), how="left", on=["segment_name"]
-            )
-            segment_df["dist_total_segments"] = segment_df.groupby("stage")["distance"].transform("sum")
-            return segment_df
+                    merged_df = segment_df.merge(
+                        data.drop(columns=["stage", "ride_day", "race_start_day", "tour_year"]),
+                        how="left",
+                        on=["segment_name"],
+                    )
+                    merged_df["dist_total_segments"] = merged_df.groupby("stage")["distance"].transform("sum")
+                    merged_df["elevation_total_segments"] = (
+                        merged_df.assign(vertical_filtered=lambda df: df["vertical"].where(df["grade"] >= 0, 0))
+                        .groupby("stage")["vertical_filtered"]
+                        .transform("sum")
+                    )
+                    if final_table is None:
+                        # even if merged_df is all NA, this ensures stable dtypes
+                        final_table = pd.DataFrame(columns=merged_df.columns)
+                        for col in merged_df.columns:
+                            final_table[col] = final_table[col].astype(merged_df[col].dtype)
+
+                    final_table = pd.concat([final_table, merged_df])
+
+    return final_table

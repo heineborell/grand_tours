@@ -234,4 +234,5 @@ def merged_tables(tour, years, segment_df, project_root, db_path):
 
                     final_table = pd.concat([final_table, merged_df])
 
+    final_table = final_table.drop(columns=["activity_id_x"])
     return final_table

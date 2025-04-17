@@ -1,9 +1,7 @@
 {
     "training": true,
     "tour": "giro",
-    "year": [
-        2022
-    ],
+    "year": 2023,
     "strava_id": null,
     "features": [
         "distance",

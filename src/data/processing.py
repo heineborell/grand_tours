@@ -56,10 +56,12 @@ def create_features(data, training):
     # Feature Engineering
     data["time_delta"] = (data["race_start_day"] - data["ride_day"]).apply(lambda x: x.days)
     try:
-        data["VAM"] = data["elevation"] / (data["elevation"] + data["distance"])
+        data["elevation_ratio"] = data["elevation"] / (data["elevation"] + data["distance"])
     except KeyError:
         print("No elevation data.")
     if training:
         data = data.drop(index=data.loc[data["ride_day"] > data["race_start_day"]].index)
         data = data.drop(index=data.loc[data["time_delta"] <= 0].index)
+    if not training:
+        data
     return data

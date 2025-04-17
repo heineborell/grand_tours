@@ -16,8 +16,10 @@ if __name__ == "__main__":
     years = [2024]
 
     segment_df_full = get_segment_table(tour, years, DB_PATH)
-    merged_df = merged_tables(tour, years, segment_df_full, PROJECT_ROOT, DB_PATH)
+    merged_df = merged_tables(tour, years, segment_df_full, PROJECT_ROOT, DB_PATH).dropna(subset=["distance"])
 
+    merged_df = merged_df.loc[merged_df["rider_name"] == "BERNAL Egan"]
+    merged_df["time_total_segments"] = merged_df.groupby("stage")["time"].transform("sum")
     # print(merged_df.groupby("stage")["rider_name"].unique())
     # merged_df = merged_df.drop_duplicates(subset=["rider_name", "stage"])
     subprocess.run(["vd", "-f", "csv", "-"], input=merged_df.to_csv(index=False), text=True)

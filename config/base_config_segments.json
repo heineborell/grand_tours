@@ -7,8 +7,7 @@
     "features": [
         "distance",
         "vertical",
-        "grade",
-        "time_delta"
+        "grade"
     ],
     "target": "time",
     "models": {

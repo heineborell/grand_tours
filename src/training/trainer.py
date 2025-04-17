@@ -29,5 +29,5 @@ class Trainer:
     def train(self, X_train, y_train):
         self.model.train(X_train, y_train)
 
-    def evaluate(self, X_test, y_test):
-        return self.model.evaluate(X_test, y_test)
+    def evaluate(self, X_test, y_test, only_predict=False):
+        return self.model.evaluate(X_test, y_test, only_predict)

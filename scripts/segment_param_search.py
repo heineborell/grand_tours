@@ -29,7 +29,7 @@ if __name__ == "__main__":
     print(f"The number of riders is {total_riders}.")
 
     for year in years:
-        for i, id in enumerate(list(rider_list)):
+        for i, id in enumerate(list(rider_list)[0:3]):
             try:
                 rider = get_rider(id, tour, year, DB_PATH, training=True, segment_data=True)
                 if rider:  # Ensure rider is not None

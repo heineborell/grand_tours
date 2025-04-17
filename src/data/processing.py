@@ -77,7 +77,7 @@ def create_features(data, training):
     try:
         data["elevation_ratio"] = data["elevation"] / (data["elevation"] + data["distance"])
     except KeyError:
-        print("No elevation data.")
+        pass
     if training:
         data = data.drop(index=data.loc[data["ride_day"] > data["race_start_day"]].index)
         data = data.drop(index=data.loc[data["time_delta"] <= 0].index)

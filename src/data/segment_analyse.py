@@ -193,10 +193,10 @@ def merged_tables(tour, years, segment_df, project_root, db_path):
             rider = get_rider(id, tour, year, db_path, training=False, segment_data=True)
             if rider:  # Ensure rider is not None
                 if rider.to_segment_df() is not None:
-                    print(
-                        f"rider id:{id}. Rider {i}/{len(rider_list)}.",
-                        f"Number of segments {len(rider.to_segment_df())}.",
-                    )
+                    # print(
+                    #     f"rider id:{id}. Rider {i}/{len(rider_list)}.",
+                    #     f"Number of segments {len(rider.to_segment_df())}.",
+                    # )
                     data = rider.to_segment_df()
                     data = create_features(data, training=False)
                     data = data.astype(

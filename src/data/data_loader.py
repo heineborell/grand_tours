@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from data.processing import clean_dataframe, create_dataframe, create_features, fetch_riders
+from data.processing import clean_dataframe, create_dataframe, create_features, fetch_features, fetch_riders
 
 
 def load_data(tour, year, db_path, training=True, segment_data=False):
@@ -12,6 +12,11 @@ def load_data(tour, year, db_path, training=True, segment_data=False):
     # create pandas dataframe given the riders, tour, year and if its training or not.
     # training true will give race datas for the tour and year.
     full_df = create_dataframe(rider_list, tour, year, db_path, training, segment_data)
+
+    if not training:
+        # fetch some features from grand_tours database
+        extra_features = fetch_features(db_path, tour, year)
+        full_df = full_df.merge(extra_features, on=["stage"], how="left")
 
     # cleaning dataframe (this one takes out the activities that have distance=elevation=0)
     # which are rides on stationary trainers

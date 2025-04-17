@@ -19,7 +19,7 @@ if __name__ == "__main__":
     config_path = Path(config_loader(tour, year, config_path=CONFIG_PATH))
 
     # Load data
-    data = load_data(tour, year, db_path=DB_PATH, training=True, segment_data=False)
+    data = load_data(tour, year, db_path=DB_PATH, training=False, segment_data=False)
     print(data)
 
     print(f"The total number of riders in the race dataset is {len(fetch_riders(DB_PATH, tour, year))}.")

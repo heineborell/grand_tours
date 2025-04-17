@@ -24,6 +24,25 @@ def fetch_riders(db_path, tour, year):
     return [rider[0] for rider in riders]
 
 
+def fetch_features(db_path, tour, year):
+    """Given tour, year and database path it returns a list of strava_ids"""
+    # Load config
+    with open(db_path, "r") as f:
+        db_path = json.loads(f.read())
+
+    # selects the grand_tours database path from path json file
+    grand_tours_db_path = os.path.expanduser(db_path["global"]["grand_tours_db_path"])
+
+    conn = sqlite3.connect(grand_tours_db_path)
+    query = (
+        f"SELECT year, TRIM(stage) AS stage, profile_score, startlist_quality "
+        f"FROM {tour}_results "
+        f"WHERE year = {year} "
+        f"GROUP BY stage"
+    )
+    return pd.read_sql_query(query, conn)
+
+
 def create_dataframe(rider_ids, tour, year, db_path, training=True, segment_data=False):
     """Given a list of riders get the ride dataframe and concat all dfs."""
     print(f"Creating dataframe training:{training}")
@@ -63,5 +82,5 @@ def create_features(data, training):
         data = data.drop(index=data.loc[data["ride_day"] > data["race_start_day"]].index)
         data = data.drop(index=data.loc[data["time_delta"] <= 0].index)
     if not training:
-        data
+        pass
     return data

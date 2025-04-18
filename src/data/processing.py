@@ -75,7 +75,7 @@ def create_features(data, training):
     # Feature Engineering
     data["time_delta"] = (data["race_start_day"] - data["ride_day"]).apply(lambda x: x.days)
     try:
-        data["elevation_ratio"] = data["elevation"] / (data["elevation"] + data["distance"])
+        data["elevation_ratio"] = data["elevation"] / (data["elevation"] + 1000 * data["distance"])
     except KeyError:
         pass
     if training:

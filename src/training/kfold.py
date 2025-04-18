@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from rich import print
-from sklearn.metrics import root_mean_squared_error
+from sklearn.metrics import mean_absolute_percentage_error, root_mean_squared_error
 from sklearn.preprocessing import StandardScaler
 from tqdm import tqdm
 
@@ -100,17 +100,17 @@ def tester(X_train, X_test, config):
 
 
 def segment_tester(X_train, X_test, config):
-    # make empty rmse holder
+    # load models and make empty rmse holder
     models = list(config["models"].keys())
-    # test_rmses = np.zeros(len(models))
-    # test_mape = np.zeros(len(models))
+    test_rmses = np.zeros(len(models))
+    test_mape = np.zeros(len(models))
 
     # Scale features
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train[config["features"]])
     y_train = X_train[config["target"]]
-    # xtrain_len = len(X_train_scaled)
-    print(X_train_scaled)
+    xtrain_len = len(X_train_scaled)
+    xtest_len = len(X_test)
 
     # loop through all models
     for j, model in enumerate(tqdm(models, total=len(models), desc="Processing Train-Test")):
@@ -120,32 +120,35 @@ def segment_tester(X_train, X_test, config):
 
         predict_result = []
         test_result = []
+        # For each stage predict the segment times
         for stage in stage_list:
             X_test_stage = X_test.loc[X_test["stage"] == stage]
             X_test_stage_scaled = scaler.transform(X_test_stage[config["features"]])
             y_test = X_test_stage[config["target"]]
-            # xtest_len = len(X_test_stage_scaled)
 
-            score = trainer.evaluate(X_test_stage_scaled, y_test, only_predict=True)
-            # print([sum(score[0]), sum(score[1]), trainer.evaluate(X_test_stage_scaled, y_test)])
-            predict_result.append(sum(score[0]))
-            test_result.append(sum(score[1]))
+            # for each stage predict the times for all segments then
+            # sum all segments and find the stage time also sum the
+            # real times and append them in a list
+            predictions = trainer.evaluate(X_test_stage_scaled, y_test, only_predict=True)
+            predict_result.append(sum(predictions[0]))
+            test_result.append(sum(predictions[1]))
 
-        print(root_mean_squared_error(predict_result, test_result))
         # # record rmse
-        # test_rmses[j] = score[0]
+        test_rmses[j] = root_mean_squared_error(predict_result, test_result)
         # # record mape
-        # test_mape[j] = score[1]
+        test_mape[j] = mean_absolute_percentage_error(predict_result, test_result)
 
-    # df = pd.DataFrame(
-    #     {
-    #         "strava_id": [config["strava_id"]] * len(models),
-    #         "Model": models,
-    #         "test_rmse": test_rmses,
-    #         "test_mape": test_mape,
-    #         "x_tr_len": [xtrain_len] * len(models),
-    #         "x_test_len": [xtest_len] * len(models),
-    #         "features": len(models) * [config["features"]],
-    #     }
-    # )
-    # print(df)
+    df = pd.DataFrame(
+        {
+            "strava_id": [config["strava_id"]] * len(models),
+            "name": X_train["rider_name"][0],
+            "Model": models,
+            "test_rmse": test_rmses,
+            "test_mape": test_mape,
+            "x_tr_len": [xtrain_len] * len(models),
+            "x_test_len": [xtest_len] * len(models),
+            "features": len(models) * [config["features"]],
+            "avg_segment_coverage": (X_test.drop_duplicates(subset=["stage"])["coverage"].mean()),
+        }
+    )
+    return df

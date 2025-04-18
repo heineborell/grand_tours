@@ -2,7 +2,7 @@
     "training": true,
     "tour": "tdf",
     "year": [
-        2024
+        2021
     ],
     "features": [
         "distance",
@@ -24,12 +24,14 @@
                 "min_samples_leaf": [
                     2,
                     3,
-                    5
+                    5,
+                    10
                 ],
                 "n_estimators": [
                     300,
                     400,
-                    600
+                    600,
+                    800
                 ]
             }
         },
@@ -43,7 +45,8 @@
                 "max_depth": [
                     3,
                     5,
-                    7
+                    7,
+                    12
                 ],
                 "learning_rate": [
                     0.1,
@@ -53,19 +56,8 @@
                 "n_estimators": [
                     300,
                     400,
-                    500
-                ]
-            }
-        },
-        "linearsvr": {
-            "hyperparameters": {
-                "gamma": 3
-            },
-            "param_grid": {
-                "gamma": [
-                    3,
-                    5,
-                    8
+                    500,
+                    800
                 ]
             }
         }

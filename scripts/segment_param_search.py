@@ -18,7 +18,7 @@ if __name__ == "__main__":
     # Enter tour and set if it is training or race, here we merged all years together
     tour = "tdf"
     training = True
-    years = [2024]
+    years = [2021]
 
     # Open base config and prepare it for parameter search by entering the tour and years you selected
     config_path = Path(config_loader(tour, years, config_path=CONFIG_PATH))
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     print(f"The number of riders is {total_riders}.")
 
     for year in years:
-        for i, id in enumerate(list(rider_list)[0:3]):
+        for i, id in enumerate(list(rider_list)):
             try:
                 rider = get_rider(id, tour, year, DB_PATH, training=True, segment_data=True)
                 if rider:  # Ensure rider is not None

@@ -112,6 +112,13 @@ def segment_tester(X_train, X_test, config):
     xtrain_len = len(X_train_scaled)
     xtest_len = len(X_test)
 
+    df_stage_len = X_test.drop_duplicates(subset=["stage"])[
+        ["strava_id", "activity_id_y", "stage", "total_distance", "dist_total_segments"]
+    ]
+    df_stage_len["coverage"] = df_stage_len["dist_total_segments"] / df_stage_len["total_distance"]
+    print(df_stage_len)
+    cov = df_stage_len["coverage"].mean()
+
     # loop through all models
     for j, model in enumerate(tqdm(models, total=len(models), desc="Processing Train-Test")):
         trainer = Trainer(model, config["models"][model]["hyperparameters"])
@@ -148,7 +155,7 @@ def segment_tester(X_train, X_test, config):
             "x_tr_len": [xtrain_len] * len(models),
             "x_test_len": [xtest_len] * len(models),
             "features": len(models) * [config["features"]],
-            "avg_segment_coverage": (X_test.drop_duplicates(subset=["stage"])["coverage"].mean()),
+            "coverage": len(models) * cov,
         }
     )
     return df

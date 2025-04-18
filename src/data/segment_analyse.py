@@ -1,9 +1,10 @@
-"""This module is mostly written by chatgpt is has to be reviewed!"""
+"""This module optimizes segment selection using different strategies."""
 
 import ast
 import json
 import os
 import sqlite3
+from bisect import bisect_right
 
 import pandas as pd
 from rich import print
@@ -23,15 +24,18 @@ def check_overlap(segment1: list[int], segment2: list[int]) -> bool:
     Returns:
         bool: True if segments overlap, False otherwise
     """
-    return max(segment1[0], segment2[0]) < min(segment1[1], segment2[1])
+    return not (segment1[1] <= segment2[0] or segment2[1] <= segment1[0])
 
 
-def optimize_for_longest_segments(segments: list[list[int]]) -> list[list[int]]:
+def optimize_segments(segments: list[list[int]], prefer_longest_segments: bool = True) -> list[list[int]]:
     """
-    Find non-overlapping segments prioritizing longer individual segments.
+    Find the optimal non-overlapping segments that either:
+    1. Maximize total distance covered (prefer_longest_segments=False)
+    2. Prefer longer individual segments (prefer_longest_segments=True)
 
     Args:
         segments: List of segments [start, end]
+        prefer_longest_segments: Whether to prioritize longer individual segments
 
     Returns:
         list: Optimized non-overlapping segments ordered by start position
@@ -39,62 +43,48 @@ def optimize_for_longest_segments(segments: list[list[int]]) -> list[list[int]]:
     if not segments:
         return []
 
-    # Sort by length (descending), then by start position for tie-breaking
-    sorted_segments = sorted(segments, key=lambda x: (-(x[1] - x[0]), x[0]))
+    if prefer_longest_segments:
+        # Sort by length (descending), then by end position for tie-breaking
+        sorted_segments = sorted(segments, key=lambda x: (-(x[1] - x[0]), x[1]))
+        selected = []
+        for segment in sorted_segments:
+            # Check if current segment overlaps with any already selected segment
+            if not any(check_overlap(segment, s) for s in selected):
+                selected.append(segment)
+        return sorted(selected, key=lambda x: x[0])
 
-    selected = []
-    for segment in sorted_segments:
-        # Check if current segment overlaps with any already selected segment
-        if not any(check_overlap(segment, selected_seg) for selected_seg in selected):
-            selected.append(segment)
-
-    # Return segments sorted by start position
-    return sorted(selected, key=lambda x: x[0])
-
-
-def optimize_for_maximum_coverage(segments: list[list[int]]) -> list[list[int]]:
-    """
-    Find non-overlapping segments maximizing total distance covered.
-    Uses dynamic programming for optimal solution.
-
-    Args:
-        segments: List of segments [start, end]
-
-    Returns:
-        list: Optimized non-overlapping segments ordered by start position
-    """
-    if not segments:
-        return []
-
-    # Sort segments by end position
-    segments = sorted(segments, key=lambda x: x[1])
+    # Weighted interval scheduling: maximize total coverage
+    # Step 1: Sort segments by end
+    sorted_segments = sorted(segments, key=lambda x: x[1])
+    ends = [s[1] for s in sorted_segments]
+    weights = [e - s for s, e in sorted_segments]
     n = len(segments)
 
-    # Initialize dp table and solution reconstruction info
-    dp = [0] * (n + 1)  # dp[i] = max coverage using first i segments
-    solution = [[] for _ in range(n + 1)]  # solution[i] = segments used for dp[i]
+    # Step 2: Compute p(i): last non-overlapping segment before i
+    p = []
+    for i in range(n):
+        # Find the rightmost position where ends[j] <= sorted_segments[i][0]
+        j = bisect_right(ends, sorted_segments[i][0]) - 1
+        p.append(j)
 
-    for i in range(1, n + 1):
-        # Find latest non-overlapping segment before current one
-        j = i - 1
-        while j > 0 and segments[j - 1][1] > segments[i - 1][0]:
-            j -= 1
+    # Step 3: DP table to store max coverage
+    dp = [0] * n
+    selected_indices = [[] for _ in range(n)]
 
-        # Case 1: Include current segment
-        include_current = (segments[i - 1][1] - segments[i - 1][0]) + dp[j]
+    for i in range(n):
+        # Include the current segment
+        incl = weights[i] + (dp[p[i]] if p[i] != -1 else 0)
+        # Exclude the current segment
+        excl = dp[i - 1] if i > 0 else 0
 
-        # Case 2: Exclude current segment
-        exclude_current = dp[i - 1]
-
-        # Choose the better option
-        if include_current > exclude_current:
-            dp[i] = include_current
-            solution[i] = solution[j] + [segments[i - 1]]
+        if incl > excl:
+            dp[i] = incl
+            selected_indices[i] = (selected_indices[p[i]] if p[i] != -1 else []) + [i]
         else:
-            dp[i] = exclude_current
-            solution[i] = solution[i - 1]
+            dp[i] = excl
+            selected_indices[i] = selected_indices[i - 1] if i > 0 else []
 
-    return sorted(solution[n], key=lambda x: x[0])
+    return [sorted_segments[i] for i in selected_indices[-1]]
 
 
 def optimize_for_shortest_segments(segments: list[list[int]]) -> list[list[int]]:
@@ -137,17 +127,11 @@ def greedy_picker(segments: list[list[int]]) -> list[list[int]]:
     if not segments:
         return []
 
-    # Sort by end position
-    sorted_segments = sorted(segments, key=lambda x: x[1])
-
-    selected = [sorted_segments[0]]
-    last_end = sorted_segments[0][1]
-
-    for segment in sorted_segments[1:]:
-        if segment[0] >= last_end:  # No overlap with last selected segment
-            selected.append(segment)
-            last_end = segment[1]
-
+    ordered_list = sorted(segments, key=lambda x: x[1])
+    selected = []
+    for elmt in ordered_list:
+        if not selected or selected[-1][1] <= elmt[0]:
+            selected.append(elmt)
     return sorted(selected, key=lambda x: x[0])
 
 
@@ -203,10 +187,12 @@ def segment_picker(segments, report=False):
     Returns:
         tuple: (longest_segments, max_coverage, greedy, shortest_segments)
     """
+    # Filter segments longer than 100m (maintaining compatibility with first version)
+    # segments = [i for i in segments if i[1] - i[0] < 100]
+
     # Apply different optimization strategies
-    segments = [i for i in segments if i[1] - i[0] < 100]
-    longest_segments = optimize_for_longest_segments(segments)
-    max_coverage = optimize_for_maximum_coverage(segments)
+    longest_segments = optimize_segments(segments, prefer_longest_segments=True)
+    max_coverage = optimize_segments(segments, prefer_longest_segments=False)
     greedy = greedy_picker(segments)
     shortest_segments = optimize_for_shortest_segments(segments)
 
@@ -223,7 +209,7 @@ def segment_picker(segments, report=False):
         print("\nOptimizing for shortest segments:")
         analyze_solution(shortest_segments)
 
-    # Return results in the same format as the original to maintain compatibility
+    # Return all four strategies to maintain compatibility with first version
     return longest_segments, max_coverage, greedy, shortest_segments
 
 
@@ -268,15 +254,15 @@ def segment_getter(db_path, stage, tour, year):
 
 def segment_analyser(db_path, stage, tour, year, hidden=False):
     segment_df = segment_getter(db_path, stage, tour, year)
-    # segment_df = segment_df[ast.literal_eval(segment_df["hidden"])]
     if not hidden:
         segment_end_points = [
             ast.literal_eval(segment) for segment in segment_df.loc[segment_df["hidden"] == "False", "end_points"]
         ]
     else:
         segment_end_points = [ast.literal_eval(segment) for segment in segment_df["end_points"]]
-    segment_end_points = [i for i in segment_end_points if i[1] - i[0] < 200]
+    segment_end_points = [i for i in segment_end_points if i[1] - i[0] < 100]
     df_fin = name_getter(segment_df, segment_picker(segment_end_points)[1])
+    # subprocess.run(["vd", "-f", "csv", "-"], input=df_fin.to_csv(index=False), text=True)
     return df_fin.drop(columns=["segment_id"])
 
 
@@ -285,7 +271,7 @@ def get_segment_table(tour, years, db_path):
     for year in years:
         stage_list = stage_list_getter(db_path, tour, year)
         for stage in stage_list:
-            segment_df = segment_analyser(db_path, stage, tour, year, hidden=True)
+            segment_df = segment_analyser(db_path, stage, tour, year)
             segment_df_full = pd.concat([segment_df_full, segment_df])
     return segment_df_full
 
@@ -300,10 +286,6 @@ def merged_tables(tour, years, segment_df, project_root, db_path):
             rider = get_rider(id, tour, year, db_path, training=False, segment_data=True)
             if rider:  # Ensure rider is not None
                 if rider.to_segment_df() is not None:
-                    # print(
-                    #     f"rider id:{id}. Rider {i}/{len(rider_list)}.",
-                    #     f"Number of segments {len(rider.to_segment_df())}.",
-                    # )
                     data = rider.to_segment_df()
                     data = create_features(data, training=False)
                     data = data.astype(
@@ -322,10 +304,13 @@ def merged_tables(tour, years, segment_df, project_root, db_path):
                         }
                     )
 
+                    segment_df["stage"] = segment_df["stage"].str.strip()
+                    # subprocess.run(["vd", "-f", "csv", "-"], input=data.to_csv(index=False), text=True)
+
                     merged_df = segment_df.merge(
-                        data.drop(columns=["stage", "ride_day", "race_start_day", "tour_year"]),
+                        data.drop(columns=["ride_day", "race_start_day", "tour_year"]),
                         how="left",
-                        on=["segment_name"],
+                        on=["segment_name", "stage"],
                     )
                     merged_df["dist_total_segments"] = merged_df.groupby("stage")["distance"].transform("sum")
                     merged_df["elevation_total_segments"] = (

@@ -45,8 +45,10 @@ if __name__ == "__main__":
                         # test data consists of race data
                         X_train = training_data
                         X_test = race_data.dropna(subset=["distance"])
+                        # subprocess.run(["vd", "-f", "csv", "-"], input=X_test.to_csv(index=False), text=True)
 
                         df = segment_tester(X_train, X_test, config)
                         print(df)
+
             except Exception as e:
                 print(f"Error processing rider {id}: {e}")

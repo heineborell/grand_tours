@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+import pandas as pd
 from rich import print as print
 
 from data.processing import create_features, get_rider
@@ -21,6 +22,7 @@ if __name__ == "__main__":
     segment_df_full = get_segment_table(tour, years, DB_PATH)
     merged_df = merged_tables(tour, years, segment_df_full, PROJECT_ROOT, DB_PATH)
 
+    all_dfs = []  # List to collect all resulting DataFrames
     for year in years:
         with open(PROJECT_ROOT / f"config/config_{tour}_training-{year}_individual.json", "r") as f:
             train_config = json.loads(f.read())
@@ -49,6 +51,11 @@ if __name__ == "__main__":
 
                         df = segment_tester(X_train, X_test, config)
                         print(df)
+                        all_dfs.append(df)
 
             except Exception as e:
-                print(f"Error processing rider {id}: {e}")
+                print(f"Error processing rider {id}: {e}")  # Concatenate and save all results
+
+    if all_dfs:
+        result_df = pd.concat(all_dfs, ignore_index=True)
+        result_df.to_csv(PROJECT_ROOT / f"results/segment_test_results_{tour}_{years[0]}.csv", index=False)

@@ -37,6 +37,8 @@ if __name__ == "__main__":
                         # training rides and race data of a rider
                         data = rider.to_segment_df()
                         training_data = create_features(data, training=True)
+                        training_data["speed"] = training_data["total_distance"] * 1000 / training_data["total_time"]
+                        training_data = training_data.loc[training_data["speed"] > 10.5].reset_index(drop=True)
                         race_data = merged_df.loc[merged_df["strava_id"] == id]
 
                         # get the best params of a given rider
@@ -47,7 +49,6 @@ if __name__ == "__main__":
                         # test data consists of race data
                         X_train = training_data
                         X_test = race_data.dropna(subset=["distance"])
-                        # subprocess.run(["vd", "-f", "csv", "-"], input=X_test.to_csv(index=False), text=True)
 
                         df = segment_tester(X_train, X_test, config)
                         print(df)

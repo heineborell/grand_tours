@@ -65,6 +65,7 @@ class Rider(BaseModel):
                         "tour_year": activity.tour_year,
                         "stage": activity.stage,
                         "total_distance": activity.distance,
+                        "total_time": activity.time,
                         "total_elevation": activity.elevation,
                         "ride_day": activity.ride_date,
                         "race_start_day": activity.race_start_day,

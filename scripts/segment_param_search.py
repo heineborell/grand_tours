@@ -18,7 +18,7 @@ if __name__ == "__main__":
     # Enter tour and set if it is training or race, here we merged all years together
     tour = "tdf"
     training = True
-    years = [2021]
+    years = [2022]
 
     # Open base config and prepare it for parameter search by entering the tour and years you selected
     config_path = Path(config_loader(tour, years, config_path=CONFIG_PATH))
@@ -34,14 +34,15 @@ if __name__ == "__main__":
                 rider = get_rider(id, tour, year, DB_PATH, training=True, segment_data=True)
                 if rider:  # Ensure rider is not None
                     if rider.to_segment_df() is not None:
-                        print(
-                            f"rider id:{id}. Rider {i}/{len(rider_list)}.",
-                            f"Number of segments {len(rider.to_segment_df())}.",
-                        )
                         data = rider.to_segment_df()
                         data = create_features(data, training=True)
                         print(data[["distance", "vertical", "grade", "time"]].isnull().sum())
-                        print(data)
+                        data["speed"] = data["total_distance"] * 1000 / data["total_time"]
+                        data = data.loc[data["speed"] > 10.5].reset_index(drop=True)
+                        print(
+                            f"rider id:{id}. Rider {i}/{len(rider_list)}.",
+                            f"Number of segments {len(data)}.",
+                        )
 
                         # # Splitting train and test
                         X_train, X_test = train_test_split(data, test_size=0.2, random_state=42)

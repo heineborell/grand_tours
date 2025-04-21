@@ -23,7 +23,7 @@ if __name__ == "__main__":
         with open(PROJECT_ROOT / f"config/config_{tour}_training-{year}_individual.json", "r") as f:
             train_config = json.loads(f.read())
         rider_list = [conf["strava_id"] for conf in train_config]
-        for i, id in enumerate(list(rider_list)[0:2]):
+        for i, id in enumerate(list(rider_list)):
             try:
                 rider = get_rider(id, tour, year, DB_PATH, training=True, segment_data=True)
                 if rider:  # Ensure rider is not None

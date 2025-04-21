@@ -1,5 +1,5 @@
 {"global": {
         "grand_tours_db_path": "~/iCloud/Research/Data_Science/Projects/data/grand_tours.db",
         "training_db_path": "~/iCloud/Research/Data_Science/Projects/data/training_merged.db",
-        "segment_details_db_path": "~/iCloud/Research/Data_Science/Projects/data/segment_details_v2.db"
+        "segment_details_db_path": "~/iCloud/Research/Data_Science/Projects/data/segment_details.db"
     }}

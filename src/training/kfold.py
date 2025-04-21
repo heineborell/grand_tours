@@ -55,7 +55,7 @@ def kfold_split_train(X_train, config, kfold):
             "features": len(models) * [config["features"]],
         }
     )
-    print(df)
+    return df
 
 
 def tester(X_train, X_test, config):
@@ -117,7 +117,6 @@ def segment_tester(X_train, X_test, config):
     ]
     df_stage_len["coverage"] = df_stage_len["dist_total_segments"] / df_stage_len["total_distance"]
     print(df_stage_len)
-    cov = df_stage_len["coverage"].mean()
 
     # loop through all models
     for j, model in enumerate(tqdm(models, total=len(models), desc="Processing Train-Test")):
@@ -155,7 +154,6 @@ def segment_tester(X_train, X_test, config):
             "x_tr_len": [xtrain_len] * len(models),
             "x_test_len": [xtest_len] * len(models),
             "features": len(models) * [config["features"]],
-            "coverage": len(models) * cov,
         }
     )
     return df

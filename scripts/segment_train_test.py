@@ -59,4 +59,6 @@ if __name__ == "__main__":
 
     if all_dfs:
         result_df = pd.concat(all_dfs, ignore_index=True)
-        result_df.to_csv(PROJECT_ROOT / f"results/segment_test_results_{tour}_{years[0]}.csv", index=False)
+        result_df.to_csv(
+            PROJECT_ROOT / f"notebooks/model_2/model_results/segment_test_results_{tour}_{years[0]}.csv", index=False
+        )

@@ -7,6 +7,16 @@ name='grand_tours'
 version="0.1"
 dependencies = [
     "numpy",
+    "pandas",
+    "ipykernel",
+    "pydantic",
+    "scikit-learn",
+    'rich',
+    "xgboost",
+    "tdqm",
+    "matplotlib",
+    "seaborn",
+    "gdown"
 ]
 
 [project.optional-dependencies]

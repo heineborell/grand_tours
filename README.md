@@ -1,6 +1,65 @@
-# Grand Tours Project for Erdos
+# Grand Tours Analysis - 2025 Erdos Group Project
 
-## The general structure of database
+## Background and Project Overview:
+
+The first objective of our project is to gather historic and training data of pro-athletes from [ProCyclingStats](https://www.procyclingstats.com) (PCS) and [Strava](https://www.strava.com) websites. Using the database created, we then train several models to predict the winner of a Stage of one of the three Grand Tours.
+
+<img src="assets/readme_images/pcs.png" width="150"> \
+<img src="assets/readme_images/strava.png" width="150">
+
+## Authors
+
+- [Yonas Getachew](https://github.com/yonasG)
+- [Neal Edgren](https://github.com/nedgren)
+- [Deniz Olgu Devecioglu](https://github.com/heineborell)
+
+## Stakeholders:
+
+- Athletes and coaches who wish to compare their performance and predict their time.
+- Sports performance companies.
+- Betting websites.
+
+## Key Performance Indicators
+
+Root mean squared error (RMSE) and mean absolute percentage error (MAPE)
+
+## Data
+
+We scraped from PCS and Strava then stored in a SQLite database:
+
+- **Grand tours data from PCS**: For a given tour and year and for each of the stages in that tour we have the name of participants, winner time and average speed, PCS profile score (to measure difficulty), vertical meters, and Startlist quality (to measure competitiveness), and how they stage was won (solo breakaway or sprint of a group).
+- **Strava race-training data**: for a given activity-id and athlete-id we have name, vertical distance, and grade of a segment. We also have the time, speed, watt, and heart rate of the athlete.
+
+- For detailed information about the database and scraping see [Appendix](#appendix).
+
+## Data Preprocessing
+
+A small library of functions was built to clean and collate the data using [Pydantic](https://docs.pydantic.dev/latest/) to ensure consistency of data types.
+
+## Modeling Approaches
+
+- **Aggregate Model**: Combines race times for 2020-2023 in conjunction with aggregated athlete workout data, in order to predict race times for 2024.
+- **Segment Model**: Uses segments from fast workout rides to try predicting race times, with a different model trained for each athlete.
+
+## Results
+
+- The aggregate model yielded best results with XGBoost regression. It returned test set scores of approximately 410 seconds RMSE and 0.025 MAPE. These increased to 945 seconds and 0.056 when attempting to predict 2024 data. These times range from about 7 to 15 minutes, which is quite small when considering that race stages can last all day. Aggregate workout features returned low feature importance scores, being drowned out by features describing the course and stage.
+
+- For the segment approach, a different model was trained for each rider. Depending on performance in cross validation, a given rider’s best model may have used linear, random forest, or XGBoost regression. On average, the results by algorithm were:
+  - **Linear**: RMSE 72 seconds / MAPE 0.30
+  - **Random Forest**: RMSE 83 seconds / MAPE 0.16
+  - **XGBoost**: RMSE 83 seconds / MAPE 0.17
+
+## Future Work
+
+- Try different algorithms for covering a ride with segments. For example covering with shortest or longest segments.
+- In addition to time prediction, the power estimation of a rider is important for riders that don’t upload their power data.
+- From the PCS database we know how a race ends (solo breakaway, sprint of a group). The prediction of this can be also interesting.
+- Bundle up all of these features and use tools like streamlit.io to create an interactive app.
+
+## Appendix:
+
+### The general structure of database
 
 Here we discuss the structure of the database, starting with the relational
 table outlined below.
@@ -58,9 +117,9 @@ An example of the structure of the `stats_data` table along with detailed column
 
 ![Table structure example 4](assets/readme_images/ss_2_4.png)
 
-Segments columns | Stats columns
-:-------------------------:|:-------------------------:
-![](assets/readme_images/ss_2_8.png) | ![](assets/readme_images/ss_2_9.png)
+|           Segments columns           |            Stats columns             |
+| :----------------------------------: | :----------------------------------: |
+| ![](assets/readme_images/ss_2_8.png) | ![](assets/readme_images/ss_2_9.png) |
 
 Finally, `strava_table` is basically merge of `segments_data` and `stats_data` tables and restricting them into race days so that there are no extra activities other than race data. We also choose the activities that are "close" to official distance. Below is the SQL query for the table construction using the data from `tdf_results`, `segments_data` and `stats_data`.
 

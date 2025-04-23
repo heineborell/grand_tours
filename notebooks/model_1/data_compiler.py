@@ -16,7 +16,7 @@ def generate_race_data_with_training_features(years, tours=['giro', 'tdf'], mini
     cwd = Path.cwd()
 
     # Navigate up two levels to get the project root
-    PROJECT_ROOT = cwd.parent
+    PROJECT_ROOT = cwd.parent.parent
     CONFIG_PATH = PROJECT_ROOT / "config/base_config.json"
     DB_PATH = PROJECT_ROOT / "config/db_path.json"
 

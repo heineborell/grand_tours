@@ -1,4 +1,4 @@
-# Created by https://www.toptal.com/developers/gitignore/api/macos,python,jupyternotebooks
+# Created by https://www.toptal.com/developers/gitignore/api/macos,python,jupyternotebooksparam
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,python,jupyternotebooks
 
 ### JupyterNotebooks ###
@@ -219,4 +219,7 @@ pyrightconfig.json
 
 #results folder
 results/
+
+#ignore database files
+*.db
 # End of https://www.toptal.com/developers/gitignore/api/macos,python,jupyternotebooks

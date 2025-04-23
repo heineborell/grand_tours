@@ -3,7 +3,9 @@ import os
 import sqlite3
 import sys
 from datetime import datetime
+from pathlib import Path
 
+import gdown
 from rich import print as print
 
 from data.schemas import Ride, Rider, Segment
@@ -314,3 +316,33 @@ def create_ride(row, training, race_day_list_full, race_day_list, segment_data):
         **({"stage": row[6].strip()} if not training else {}),
         segments=segments,
     )
+
+
+def download_database(urls, filenames):
+    """
+    Downloads files from a list of Google Drive URLs into the data/ folder,
+    skipping files that already exist. Filenames are provided explicitly.
+
+    Args:
+        urls (list of str): Google Drive file URLs.
+        filenames (list of str): Corresponding filenames for each URL.
+    """
+    assert len(urls) == len(filenames), "Each URL must have a corresponding filename."
+
+    PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+    target_dir = PROJECT_ROOT / "data"
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    for url, filename in zip(urls, filenames):
+        target_path = target_dir / filename
+
+        if target_path.exists():
+            print(f"File already exists, skipping: {filename}")
+            continue
+
+        # Download and save with the given filename
+        output = gdown.download(url, output=str(target_path), quiet=False, fuzzy=True)
+        if output is not None:
+            print(f"Downloaded and saved: {filename}")
+        else:
+            print(f"Failed to download: {url}")

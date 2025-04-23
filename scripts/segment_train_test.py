@@ -60,12 +60,3 @@ if __name__ == "__main__":
     if all_dfs:
         result_df = pd.concat(all_dfs, ignore_index=True)
         result_df.to_csv(PROJECT_ROOT / f"results/segment_test_results_{tour}_{years[0]}.csv", index=False)
-
-    #         # Convert scaled features back to a DataFrame
-    # X_train_scaled_df = pd.DataFrame(X_train_scaled, columns=config["features"], index=X_train.index)
-    #
-    # # Add the target column back
-    # X_train_recombined = X_train_scaled_df.copy()
-    # X_train_recombined[config["target"]] = y_train
-    # kfold = KFold(n_splits=5, shuffle=True, random_state=31)
-    # kfold_split_train(X_train_recombined, config, kfold)

@@ -1,4 +1,21 @@
-# Grand Tours Project for Erdos
+# Grand Tours Analysis - 2025 Erdos Group Project
+
+## Background and Project Overview:
+The first objective of our project is to gather historic and training data of pro-athletes from [ProCyclingStats](https://www.procyclingstats.com) (PCS) and [Strava](https://www.strava.com) websites. Using the database created, we then train several models to predict the winner of a Stage of one of the three Grand Tours.
+
+## Authors
+- [Yonas Getachew](https://github.com/yonasG)
+- [Neal Edgren](https://github.com/nedgren)
+- [Deniz Olgu Devecioglu](https://github.com/heineborell)
+
+## Stakeholders:
+Athletes and coaches who wish to compare their performance and predict their time
+Sports performance companies
+Betting websites.
+
+## Key Performance Indicators
+Root mean squared error (RMSE) and mean absolute percentage error (MAPE)
+
 
 ## The general structure of database
 

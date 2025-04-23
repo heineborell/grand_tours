@@ -14,7 +14,7 @@ if __name__ == "__main__":
     DB_PATH = PROJECT_ROOT / "config/db_path.json"
 
     # Enter tour and set if it is training or race, here we merged all years together
-    tour = "tdf"
+    tour = "giro"
     training = True
     years = [2024]
 
@@ -51,4 +51,6 @@ if __name__ == "__main__":
 
     if all_dfs:
         result_df = pd.concat(all_dfs, ignore_index=True)
-        result_df.to_csv(PROJECT_ROOT / f"results/segment_cv_results_{tour}_{years[0]}.csv", index=False)
+        result_df.to_csv(
+            PROJECT_ROOT / f"notebooks/model_2/model_results/segment_cv_results_{tour}_{years[0]}.csv", index=False
+        )

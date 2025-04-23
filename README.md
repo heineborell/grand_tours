@@ -23,6 +23,7 @@ The first objective of our project is to gather historic and training data of pr
 
 Root mean squared error (RMSE) and mean absolute percentage error (MAPE)
 
+
 ## Data
 
 We scraped from PCS and Strava then stored in a SQLite database:
@@ -31,6 +32,13 @@ We scraped from PCS and Strava then stored in a SQLite database:
 - **Strava race-training data**: for a given activity-id and athlete-id we have name, vertical distance, and grade of a segment. We also have the time, speed, watt, and heart rate of the athlete.
 
 - For detailed information about the database and scraping see [Appendix](#appendix).
+
+## EDA
+A quick summary of the data contained in grand_tours database is as follows 
+
+<img src="assets/readme_images/tdf_data_yearly_summary.png" width="500"> \
+<img src="assets/readme_images/giro_data_yearly_summary.png" width="500">\
+<img src="assets/readme_images/vuelta_data_yearly_summary.png" width="500"> 
 
 ## Data Preprocessing
 

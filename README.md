@@ -4,6 +4,9 @@
 
 The first objective of our project is to gather historic and training data of pro-athletes from [ProCyclingStats](https://www.procyclingstats.com) (PCS) and [Strava](https://www.strava.com) websites. Using the database created, we then train several models to predict the winner of a Stage of one of the three Grand Tours.
 
+<img src="assets/readme_images/pcs.png" width="150"> \
+<img src="assets/readme_images/strava.png" width="150">
+
 ## Authors
 
 - [Yonas Getachew](https://github.com/yonasG)
@@ -27,7 +30,7 @@ We scraped from PCS and Strava then stored in a SQLite database:
 - **Grand tours data from PCS**: For a given tour and year and for each of the stages in that tour we have the name of participants, winner time and average speed, PCS profile score (to measure difficulty), vertical meters, and Startlist quality (to measure competitiveness), and how they stage was won (solo breakaway or sprint of a group).
 - **Strava race-training data**: for a given activity-id and athlete-id we have name, vertical distance, and grade of a segment. We also have the time, speed, watt, and heart rate of the athlete.
 
-- For detailed information about the database see [Appendix](#appendix).
+- For detailed information about the database and scraping see [Appendix](#appendix).
 
 ## Data Preprocessing
 

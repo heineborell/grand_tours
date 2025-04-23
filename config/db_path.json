@@ -1,7 +1,7 @@
 {
     "global": {
-        "grand_tours_db_path": "/Users/dmini/Projects/grand_tours/data/grand_tours.db",
-        "training_db_path": "/Users/dmini/Projects/grand_tours/data/training_merged_v2.db",
-        "segment_details_db_path": "/Users/dmini/Projects/grand_tours/data/segment_details_v3.db"
+        "grand_tours_db_path": "/Users/deniz/Projects/grand_tours/data/grand_tours.db",
+        "training_db_path": "/Users/deniz/Projects/grand_tours/data/training_merged_v2.db",
+        "segment_details_db_path": "/Users/deniz/Projects/grand_tours/data/segment_details_v3.db"
     }
 }

@@ -1,3 +1,14 @@
+"""
+This script automates the setup process for the cycling grand tour data analysis project.
+
+It performs the following steps:
+1. Downloads the required database files from Google Drive.
+2. Sets up local file paths for accessing the downloaded data.
+3. Loads a sample tour and year from the database to verify successful setup.
+
+This script ensures that the necessary data is available and correctly configured for further analysis or development.
+"""
+
 from pathlib import Path
 
 from rich import print as print

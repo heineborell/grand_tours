@@ -3,6 +3,7 @@ from pathlib import Path
 from rich import print as print
 
 from data.data_loader import config_loader, load_data
+from data.database import download_database
 from data.processing import fetch_riders
 
 if __name__ == "__main__":
@@ -10,6 +11,13 @@ if __name__ == "__main__":
     PROJECT_ROOT = Path(__file__).resolve().parent.parent  # Adjust if needed
     CONFIG_PATH = PROJECT_ROOT / "config/base_config.json"
     DB_PATH = PROJECT_ROOT / "config/db_path.json"
+
+    # Google Drive URL
+    urls = [
+        "https://drive.google.com/file/d/1QWc76dIf-lVVbbs4QpDoQwIRvUwFkvZP/view?usp=share_link",
+        "https://drive.google.com/file/d/1ZWI6orj1HrjZ-MH_vKddJyXIpLPwyIcl/view?usp=share_link",
+    ]
+    download_database(urls=urls, filenames=["segment_details_v2.db", "grand_tours.db"])
 
     # Enter tour, year of your choice
     tour = "giro"

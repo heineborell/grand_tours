@@ -346,3 +346,21 @@ def download_database(urls, filenames):
             print(f"Downloaded and saved: {filename}")
         else:
             print(f"Failed to download: {url}")
+
+
+def set_db_path():
+    PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+    config_path = PROJECT_ROOT / "config/db_path.json"
+    with open(config_path, "r") as f:
+        config = json.loads(f.read())
+
+    config["global"]["grand_tours_db_path"] = str(PROJECT_ROOT / "data/grand_tours.db")
+    config["global"]["training_db_path"] = str(PROJECT_ROOT / "data/training_merged_v2.db")
+    config["global"]["segment_details_db_path"] = str(PROJECT_ROOT / "data/segment_details_v2.db")
+
+    json_data = json.dumps(config, indent=4)
+    with open(
+        config_path,
+        "w",
+    ) as f:
+        f.write(json_data)

@@ -16,7 +16,7 @@ if __name__ == "__main__":
     DB_PATH = PROJECT_ROOT / "config/db_path.json"
 
     # Enter tour and set if it is training or race, here we merged all years together
-    tour = "tdf"
+    tour = "giro"
     training = True
     years = [2024]
 

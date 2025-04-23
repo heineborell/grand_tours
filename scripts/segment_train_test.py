@@ -16,7 +16,7 @@ if __name__ == "__main__":
     # Enter tour and set if it is training or race, here we merged all years together
     tour = "tdf"
     training = True
-    years = [2024]
+    years = [2022]
 
     # get the non-overlapping segment table of all riders given a tour
     segment_df_full = get_segment_table(tour, years, DB_PATH)

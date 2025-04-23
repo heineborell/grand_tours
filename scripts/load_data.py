@@ -16,9 +16,9 @@ if __name__ == "__main__":
     urls = [
         "https://drive.google.com/file/d/1ZWI6orj1HrjZ-MH_vKddJyXIpLPwyIcl/view?usp=share_link",
         "https://drive.google.com/file/d/101u1n86zCi37PbEHtu5rqwWrcvh1TNXs/view?usp=share_link",
-        "https://drive.google.com/file/d/1QWc76dIf-lVVbbs4QpDoQwIRvUwFkvZP/view?usp=share_link",
+        "https://drive.google.com/file/d/1_lGxibgY0sLqoq9-BvKeNuXlOBmmwSKh/view?usp=share_link",
     ]
-    download_database(urls=urls, filenames=["grand_tours.db", "training_merged_v2.db", "segment_details_v2.db"])
+    download_database(urls=urls, filenames=["grand_tours.db", "training_merged_v2.db", "segment_details_v3.db"])
     set_db_path()
 
     # Enter tour, year of your choice

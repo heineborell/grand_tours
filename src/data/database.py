@@ -356,7 +356,7 @@ def set_db_path():
 
     config["global"]["grand_tours_db_path"] = str(PROJECT_ROOT / "data/grand_tours.db")
     config["global"]["training_db_path"] = str(PROJECT_ROOT / "data/training_merged_v2.db")
-    config["global"]["segment_details_db_path"] = str(PROJECT_ROOT / "data/segment_details_v2.db")
+    config["global"]["segment_details_db_path"] = str(PROJECT_ROOT / "data/segment_details_v3.db")
 
     json_data = json.dumps(config, indent=4)
     with open(

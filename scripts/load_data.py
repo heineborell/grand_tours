@@ -3,7 +3,7 @@ from pathlib import Path
 from rich import print as print
 
 from data.data_loader import config_loader, load_data
-from data.database import download_database
+from data.database import download_database, set_db_path
 from data.processing import fetch_riders
 
 if __name__ == "__main__":
@@ -14,10 +14,12 @@ if __name__ == "__main__":
 
     # Google Drive URL
     urls = [
-        "https://drive.google.com/file/d/1QWc76dIf-lVVbbs4QpDoQwIRvUwFkvZP/view?usp=share_link",
         "https://drive.google.com/file/d/1ZWI6orj1HrjZ-MH_vKddJyXIpLPwyIcl/view?usp=share_link",
+        "https://drive.google.com/file/d/101u1n86zCi37PbEHtu5rqwWrcvh1TNXs/view?usp=share_link",
+        "https://drive.google.com/file/d/1QWc76dIf-lVVbbs4QpDoQwIRvUwFkvZP/view?usp=share_link",
     ]
-    download_database(urls=urls, filenames=["segment_details_v2.db", "grand_tours.db"])
+    download_database(urls=urls, filenames=["grand_tours.db", "training_merged_v2.db", "segment_details_v2.db"])
+    set_db_path()
 
     # Enter tour, year of your choice
     tour = "giro"

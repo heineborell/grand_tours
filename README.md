@@ -51,7 +51,7 @@ A small library of functions was built to clean and collate the data using [Pyda
   - **Random Forest**: RMSE 83 seconds / MAPE 0.16
   - **XGBoost**: RMSE 83 seconds / MAPE 0.17
 
-- For the whole stages of a tour have the following results
+- For the whole stages of a tour we have the following results
   <img src="assets/readme_images/model_1_rmse.png" width="750">
   <img src="assets/readme_images/model_1_mape.png" width="750">
 

@@ -23,7 +23,6 @@ The first objective of our project is to gather historic and training data of pr
 
 Root mean squared error (RMSE) and mean absolute percentage error (MAPE)
 
-
 ## Data
 
 We scraped from PCS and Strava then stored in a SQLite database:
@@ -34,11 +33,12 @@ We scraped from PCS and Strava then stored in a SQLite database:
 - For detailed information about the database and scraping see [Appendix](#appendix).
 
 ## EDA
-A quick summary of the data contained in grand_tours database is as follows 
+
+A quick summary of the data contained in grand_tours database is as follows
 
 <img src="assets/readme_images/tdf_data_yearly_summary.png" width="500"> \
 <img src="assets/readme_images/giro_data_yearly_summary.png" width="500">\
-<img src="assets/readme_images/vuelta_data_yearly_summary.png" width="500"> 
+<img src="assets/readme_images/vuelta_data_yearly_summary.png" width="500">
 
 ## Data Preprocessing
 
@@ -96,6 +96,28 @@ pip install -e .
 ## Run the script below from the project root to download database files and set your paths correctly
 python scripts/prepare_dataset.py
 ```
+
+## 🚀 How to Run the Model-2
+
+1. First, run the `segment_param_search.py` script for a given tour and year. This script performs a grid search to find the best models for each rider. The search will be conducted for all selected riders and may take 4–5 hours due to the grid search process. Once complete, a configuration file will be created at `grand_tour/config/config_{tour}_training-{year}_individual.json`.
+
+```bash
+python scripts/segment_param_search.py
+```
+
+2. Then, for k-fold training, run `segment_kfold_train.py`. This script will compute RMSE and MAPE for each rider and model, and save the results to `notebooks/model_results/segment_cv_results_{tour}_{year}.csv`.
+
+```bash
+python scripts/segment_kfold_train.py
+```
+
+3. For the test results run `segment_train_test.py`. This script will compute RMSE and MAPE for each rider and model, and save the results to `notebooks/model_results/segment_test_results_{tour}_{year}.csv`.
+
+```bash
+python scripts/segment_train_test.py
+```
+
+4. Finally, use the Jupyter notebooks `plot_cv_rmse.ipynb` and `plot_segment_test.ipynb` to visualize the results using the generated CSV files.
 
 ## Appendix:
 

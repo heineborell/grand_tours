@@ -53,10 +53,15 @@ A small library of functions was built to clean and collate the data using [Pyda
 
 - The aggregate model yielded best results with XGBoost regression. It returned test set scores of approximately 410 seconds RMSE and 0.025 MAPE. These increased to 945 seconds and 0.056 when attempting to predict 2024 data. These times range from about 7 to 15 minutes, which is quite small when considering that race stages can last all day. Aggregate workout features returned low feature importance scores, being drowned out by features describing the course and stage.
 
-- For the segment approach, a different model was trained for each rider. Depending on performance in cross validation, a given rider’s best model may have used linear, random forest, or XGBoost regression. On average, the results by algorithm were:
+- For the segment approach, a different model was trained for each rider. Depending on performance in cross validation, a given rider’s best model may have used linear, random forest, or XGBoost regression. On average, the results for the prediction of a single segment time by algorithm were:
+
   - **Linear**: RMSE 72 seconds / MAPE 0.30
   - **Random Forest**: RMSE 83 seconds / MAPE 0.16
   - **XGBoost**: RMSE 83 seconds / MAPE 0.17
+
+- For the whole stages of a tour we have the following results
+  <img src="assets/readme_images/model_1_rmse.png" width="750">
+  <img src="assets/readme_images/model_1_mape.png" width="750">
 
 ## Future Work
 
@@ -64,6 +69,33 @@ A small library of functions was built to clean and collate the data using [Pyda
 - In addition to time prediction, the power estimation of a rider is important for riders that don’t upload their power data.
 - From the PCS database we know how a race ends (solo breakaway, sprint of a group). The prediction of this can be also interesting.
 - Bundle up all of these features and use tools like streamlit.io to create an interactive app.
+
+## 📦 Installation
+
+**Requirements:**
+
+- Python 3.12+
+- pip
+
+**Steps:**
+
+```bash
+# Clone the repository
+git clone https://github.com/heineborell/grand_tours.git
+
+# Navigate to the project directory
+cd grand_tours
+
+# (Optional) Create and activate a virtual environment
+python -m venv venv
+source venv/bin/activate  # or venv\Scripts\activate on Windows
+
+# Install dependencies
+pip install -e .
+
+## Run the script below from the project root to download database files and set your paths correctly
+python scripts/prepare_dataset.py
+```
 
 ## Appendix:
 
@@ -77,6 +109,7 @@ table outlined below.
 <img src="assets/readme_images/ss_2_12.png" width="650">
 
 ### The tour results dataset
+
 The primary tables in our database are `tdf_results`, `giro_results` and
 `vuelta_results`, which contain the historical data of the tours scraped from
 [ProCyclingStats](https://www.procyclingstats.com), as an [example](https://www.procyclingstats.com/race/tour-de-france/2024/stage-20). These tables do not have primary keys (i.e., unique values) because their structure involves repeated entries for each rider across different stages and years, as shown below:
@@ -94,22 +127,23 @@ The primary tables in our database are `tdf_results`, `giro_results` and
     questions are well-defined. </p> </div>
 
 ### Strava datasets
+
 <div style="display: flex; align-items: center;">
-  <p>Working with Strava datasets requires a more intricate approach for both scraping and structuring. We start with the <code>strava_names</code> table, which contains riders' <code>names</code> and their unique <code>athlete_id</code>. While constructing this table, we assumed that the names in the <code>[tour]_results</code> table are unique (where [tour] = tdf, giro, or vuelta). This assumption is reasonable, as the dataset only includes results from 2010 onward, aligning with Strava's historical data coverage. </p> 
+  <p>Working with Strava datasets requires a more intricate approach for both scraping and structuring. We start with the <code>strava_names</code> table, which contains riders' <code>names</code> and their unique <code>athlete_id</code>. While constructing this table, we assumed that the names in the <code>[tour]_results</code> table are unique (where [tour] = tdf, giro, or vuelta). This assumption is reasonable, as the dataset only includes results from 2010 onward, aligning with Strava's historical data coverage. </p>
   <img src="assets/readme_images/ss_2_7.png" alt="Description" style="width: 250px; margin-right: 20px;">
 </div>
 
-The table `strava_names` is scraped by first taking the names of the riders from <code>[tour]_results</code> tables starting from 2010, then each name is searched through Strava search athlete tab. Once we have the result we simply choose the `athlete_id` number with the pro tag on in (see the image below).
+The table `strava_names` is scraped by first taking the names of the riders from <code>[tour]\_results</code> tables starting from 2010, then each name is searched through Strava search athlete tab. Once we have the result we simply choose the `athlete_id` number with the pro tag on in (see the image below).
 
 <img src="assets/readme_images/ss_2_10.png" width="450">
 
-After  forming the `strava_names` table we are now in a position to extract the data from riders profile. For that we first visit the riders main page which looks like the following.
+After forming the `strava_names` table we are now in a position to extract the data from riders profile. For that we first visit the riders main page which looks like the following.
 
 ![image](assets/readme_images/ss_2_11.png)
 
-This page lists their activities weekly, so by using the date information from the <code>[tour]_results</code> tables  we can pinpoint each tour-week and scrape the `activity_id` generated throughout the event. Luckily, like the <code>athlete_id</code> each `activity_id` is unique. There is one thing we need to be careful though: although we scraped the activities during the event, by the nature of this scraping process we also extracted some extra activities. This is because, as you can imagine, some riders upload all of their rides including their ride to start-position or rides in their rest days and so on. Therefore, we need a way to clean those activities, which we will discuss after explaining the `segments_data` and `stats-data` tables.
+This page lists their activities weekly, so by using the date information from the <code>[tour]\_results</code> tables we can pinpoint each tour-week and scrape the `activity_id` generated throughout the event. Luckily, like the <code>athlete_id</code> each `activity_id` is unique. There is one thing we need to be careful though: although we scraped the activities during the event, by the nature of this scraping process we also extracted some extra activities. This is because, as you can imagine, some riders upload all of their rides including their ride to start-position or rides in their rest days and so on. Therefore, we need a way to clean those activities, which we will discuss after explaining the `segments_data` and `stats-data` tables.
 
-The more data-intensive Strava tables are `segments_data` and `stats_data`. As the name suggests, `segments_data` is scraped from the segment information of a Strava ride. This table can become quite extensive, depending on the number of segments. It includes details such as time, speed, VAM ([velocità ascensionale media](https://en.wikipedia.org/wiki/VAM_(bicycling)) or "average ascent speed" in English), power, and heart rate—if the rider has chosen to upload these metrics.
+The more data-intensive Strava tables are `segments_data` and `stats_data`. As the name suggests, `segments_data` is scraped from the segment information of a Strava ride. This table can become quite extensive, depending on the number of segments. It includes details such as time, speed, VAM ([velocità ascensionale media](<https://en.wikipedia.org/wiki/VAM_(bicycling)>) or "average ascent speed" in English), power, and heart rate—if the rider has chosen to upload these metrics.
 
 ![Table structure example 5](assets/readme_images/ss_2_5.png)
 

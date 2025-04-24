@@ -20,5 +20,5 @@ best_params = {'learning_rate': 0.1,
                 'max_depth': 5,
                 'n_estimators': 1000,
                 'reg_alpha': 0.1,
-                'reg_lambda': 5
+                'reg_lambda': 5 #There appeared to be no difference in performance betweenlambdas of 5 and 10
                 }

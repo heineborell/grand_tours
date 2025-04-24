@@ -12,11 +12,8 @@ def generate_race_data_with_training_features(years, tours=['giro', 'tdf'], mini
     '''Generates a table of data from the available races in the tours list for the given years, with added features 
     engineered from the training database corresponding to the tour and year'''
 
-    # Get the current working directory
-    cwd = Path.cwd()
-
-    # Navigate up two levels to get the project root
-    PROJECT_ROOT = cwd.parent.parent
+    # Navigate up to the project root
+    PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
     CONFIG_PATH = PROJECT_ROOT / "config/base_config.json"
     DB_PATH = PROJECT_ROOT / "config/db_path.json"
 

@@ -45,13 +45,15 @@ A small library of functions was built to clean and collate the data using [Pyda
 
 - The aggregate model yielded best results with XGBoost regression. It returned test set scores of approximately 410 seconds RMSE and 0.025 MAPE. These increased to 945 seconds and 0.056 when attempting to predict 2024 data. These times range from about 7 to 15 minutes, which is quite small when considering that race stages can last all day. Aggregate workout features returned low feature importance scores, being drowned out by features describing the course and stage.
 
-- For the segment approach, a different model was trained for each rider. Depending on performance in cross validation, a given rider’s best model may have used linear, random forest, or XGBoost regression. On average, the results by algorithm were:
+- For the segment approach, a different model was trained for each rider. Depending on performance in cross validation, a given rider’s best model may have used linear, random forest, or XGBoost regression. On average, the results for the prediction of a single segment time by algorithm were:
+
   - **Linear**: RMSE 72 seconds / MAPE 0.30
   - **Random Forest**: RMSE 83 seconds / MAPE 0.16
   - **XGBoost**: RMSE 83 seconds / MAPE 0.17
 
-<img src="assets/readme_images/model_1_rmse.png" width="750">
-<img src="assets/readme_images/model_1_mape.png" width="750">
+- For the whole stages of a tour have the following results
+  <img src="assets/readme_images/model_1_rmse.png" width="750">
+  <img src="assets/readme_images/model_1_mape.png" width="750">
 
 ## Future Work
 

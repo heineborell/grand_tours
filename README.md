@@ -30,10 +30,11 @@ We scraped from PCS and Strava then stored in a SQLite database:
 - **Grand tours data from PCS**: For a given tour and year and for each of the stages in that tour we have the name of participants, winner time and average speed, PCS profile score (to measure difficulty), vertical meters, and Startlist quality (to measure competitiveness), and how they stage was won (solo breakaway or sprint of a group).
 - **Strava race-training data**: for a given activity-id and athlete-id we have name, vertical distance, and grade of a segment. We also have the time, speed, watt, and heart rate of the athlete.
 
-- For detailed information about the database and scraping see [Appendix](#appendix).
+- For detailed information about the database and scraping see [Appendix](#appendix) and scraping [repo](https://github.com/heineborell/tdf_results).
 
 ## EDA
-A quick summary of the data contained in the grand_tours database is as follows 
+
+A quick summary of the data contained in the grand_tours database is as follows
 
 <img src="assets/readme_images/tdf_data_yearly_summary.png" width="750"> \
 <img src="assets/readme_images/giro_data_yearly_summary.png" width="750">\
@@ -101,8 +102,8 @@ python scripts/prepare_dataset.py
 1. To how the datasets were generated, you can consult the files `data_compiler.py` and `dataset_generator.py` in `notebooks/model_1`. The first of these files contains a function that assembles data frames of grand tour times with aggregated workout data. It relies heavily on the funtion `load data` found in `src/data/data_loader.py` which extracts data from the databases downloaded using the `prepare_dataset.py` script. The second file calls the function in `data_compiler.py` function to generate a 2020-2023 data frame and 2024 data frame, splits the 2020-2023 data into train and test sets, and then saves all four frames in the nearby `data` directory.
 
 2. There are three numbered jupyter notebooks in the directory. You may go through these in order to evaluate the work there. There is an optional fourth unlabled notebook demonstrating a quick grid search for random forest.
-   
-## 🚀 How to Run the Model-2
+
+## How to Run the Model-2
 
 1. First, run the `segment_param_search.py` script for a given tour and year. This script performs a grid search to find the best models for each rider. The search will be conducted for all selected riders and may take 4–5 hours due to the grid search process. Once complete, a configuration file will be created at `grand_tour/config/config_{tour}_training-{year}_individual.json`.
 

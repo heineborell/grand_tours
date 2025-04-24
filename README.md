@@ -33,12 +33,11 @@ We scraped from PCS and Strava then stored in a SQLite database:
 - For detailed information about the database and scraping see [Appendix](#appendix).
 
 ## EDA
+A quick summary of the data contained in the grand_tours database is as follows
 
-A quick summary of the data contained in grand_tours database is as follows
-
-<img src="assets/readme_images/tdf_data_yearly_summary.png" width="500"> \
-<img src="assets/readme_images/giro_data_yearly_summary.png" width="500">\
-<img src="assets/readme_images/vuelta_data_yearly_summary.png" width="500">
+<img src="assets/readme_images/tdf_data_yearly_summary.png" width="750"> \
+<img src="assets/readme_images/giro_data_yearly_summary.png" width="750">\
+<img src="assets/readme_images/vuelta_data_yearly_summary.png" width="750">
 
 ## Data Preprocessing
 

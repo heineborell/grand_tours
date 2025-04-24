@@ -217,6 +217,9 @@ poetry.toml
 # LSP config files
 pyrightconfig.json
 
+# ignore db_path created by local user
+config/db_path.json
+
 #results folder
 results/
 

@@ -96,6 +96,12 @@ pip install -e .
 python scripts/prepare_dataset.py
 ```
 
+## How to Run Model-1
+
+1. To how the datasets were generated, you can consult the files `data_compiler.py` and `dataset_generator.py` in `notebooks/model_1`. The first of these files contains a function that assembles data frames of grand tour times with aggregated workout data. It relies heavily on the funtion `load data` found in `src/data/data_loader.py` which extracts data from the databases downloaded using the `prepare_dataset.py` script. The second file calls the function in `data_compiler.py` function to generate a 2020-2023 data frame and 2024 data frame, splits the 2020-2023 data into train and test sets, and then saves all four frames in the nearby `data` directory.
+
+2. There are three numbered jupyter notebooks in the directory. You may go through these in order to evaluate the work there. There is an optional fourth unlabled notebook demonstrating a quick grid search for random forest.
+   
 ## 🚀 How to Run the Model-2
 
 1. First, run the `segment_param_search.py` script for a given tour and year. This script performs a grid search to find the best models for each rider. The search will be conducted for all selected riders and may take 4–5 hours due to the grid search process. Once complete, a configuration file will be created at `grand_tour/config/config_{tour}_training-{year}_individual.json`.
